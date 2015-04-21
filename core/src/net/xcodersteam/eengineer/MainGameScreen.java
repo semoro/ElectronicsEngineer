@@ -28,6 +28,7 @@ public class MainGameScreen implements Screen{
         cm = new ConstructionManager(16, 16);
         new Metal(cm.getCell(0, 0));
         new Silicon(cm.getCell(0, 1), Silicon.Type.P).connection = 1| 4 | 2 | 8;
+        cm.getCell(0, 1).via = true;
     }
 
     private final int cellSize = 20;
@@ -39,6 +40,7 @@ public class MainGameScreen implements Screen{
         //batch.draw(img, 0, 0);
         //batch.end();
         renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setAutoShapeType(true);
         renderConstruction(100, 100);
         renderer.end();
     }
@@ -58,6 +60,12 @@ public class MainGameScreen implements Screen{
                         int borderBottom = -(component.connection >> 2 & 1) * 3;
                         int borderLeft = -(component.connection >> 3 & 1) * 3;
                         renderer.rect(x * (cellSize + 1) + borderLeft + 2f, y * (cellSize + 1) + borderBottom + 2f, cellSize - borderLeft - borderRight - 4f, cellSize - borderBottom - borderTop - 4f);
+                    }
+                    if(cm.construction[x][y].via){
+                        renderer.setColor(Color.BLACK);
+                        renderer.set(ShapeRenderer.ShapeType.Line);
+                        renderer.circle(x * (cellSize + 1) + cellSize / 2, y * (cellSize + 1) + cellSize / 2, 7f);
+                        renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
                 }
             }
