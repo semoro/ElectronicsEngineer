@@ -14,7 +14,7 @@ public class ConstructionManager {
         construction = new Cell[height][width];
     }
     public Cell getCell(int x,int y){
-        if(x > 0 && x < width && y > 0 && y < height){
+        if(x >= 0 && x < width && y >= 0 && y < height){
             Cell c = construction[x][y];
             if(c == null){
                 c = new Cell();
