@@ -16,7 +16,11 @@ public class Silicon extends GirdComponent{
             color = c;
         }
         public Type combine(Type type1){
-            return Type.valueOf(this.name() + type1.name());
+            try {
+                return Type.valueOf(this.name() + type1.name());
+            } catch (IllegalArgumentException e){
+                return type1;
+            }
         }
     }
     public Silicon(Cell cell, Type type) {

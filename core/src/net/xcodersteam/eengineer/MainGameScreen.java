@@ -1,11 +1,21 @@
 package net.xcodersteam.eengineer;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Silicon;
 
@@ -21,14 +31,99 @@ public class MainGameScreen implements Screen{
     SpriteBatch batch;
     //Texture img;
     ShapeRenderer renderer;
+    TextButton button;
+    Stage stage;
     public  MainGameScreen () {
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
         //img = new Texture("badlogic.jpg");
         cm = new ConstructionManager(16, 16);
-        new Metal(cm.getCell(0, 0));
-        new Silicon(cm.getCell(0, 1), Silicon.Type.P).connection = 1| 4 | 2 | 8;
-        cm.getCell(0, 1).via = true;
+        stage = new Stage();
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        BitmapFont font = generator.generateFont(parameter);
+        generator.dispose();
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = font;
+        button = new TextButton(new String(), style);
+        button.setText("Text");
+        button.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        button.setY(Gdx.graphics.getHeight() - cellSize * 3);
+        button.setWidth(cellSize * 3);
+        button.setHeight(cellSize * 3);
+        stage.addActor(button);
+        button.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if(event.toString().equals("touchDown")) {
+                    System.out.println("Kek");
+                    if(button.getText().toString().equals("Kek"))
+                        button.setText("Text");
+                    else {
+                        button.setText("Kek");
+                    }
+                }
+                return true;
+            }
+        });
+        Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputProcessor() {
+            @Override
+            public boolean keyDown(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyUp(int keycode) {
+                return false;
+            }
+
+            @Override
+            public boolean keyTyped(char character) {
+                return false;
+            }
+
+            public Cell getCellAt(int screenX, int screenY) {
+                return cm.getCell((screenX - 100) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1));
+            }
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int b) {
+                if(button.getText().toString().equals("Kek")){
+                    switch(b) {
+                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
+                        if (cell != null)
+                            new Silicon(cell, Silicon.Type.P);
+                            break;
+                        case Input.Buttons.RIGHT:
+                            try{
+                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] = null;
+                            } catch (Exception e) {
+
+                            }
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                return false;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                return false;
+            }
+
+            @Override
+            public boolean mouseMoved(int screenX, int screenY) {
+                return false;
+            }
+
+            @Override
+            public boolean scrolled(int amount) {
+                return false;
+            }
+        }));
     }
 
     private final int cellSize = 20;
@@ -42,7 +137,14 @@ public class MainGameScreen implements Screen{
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setAutoShapeType(true);
         renderConstruction(100, 100);
+        renderGui();
         renderer.end();
+        stage.act(delta);
+        stage.draw();
+    }
+    public void renderGui(){
+        renderer.setColor(Color.RED);
+        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3, cellSize * 3, cellSize * 3);
     }
     public void renderConstruction(float sx, float sy){
         renderer.translate(sx, sy, 0);
