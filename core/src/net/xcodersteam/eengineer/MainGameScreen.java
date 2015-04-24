@@ -3,19 +3,14 @@ package net.xcodersteam.eengineer;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Silicon;
 
@@ -31,7 +26,10 @@ public class MainGameScreen implements Screen{
     SpriteBatch batch;
     //Texture img;
     ShapeRenderer renderer;
-    TextButton button;
+    TextButton buttonP;
+    TextButton buttonC;
+    TextButton buttonM;
+    TextButton viabutton;
     Stage stage;
     public  MainGameScreen () {
         batch = new SpriteBatch();
@@ -45,23 +43,79 @@ public class MainGameScreen implements Screen{
         generator.dispose();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
-        button = new TextButton(new String(), style);
-        button.setText("Text");
-        button.setX(Gdx.graphics.getWidth() - cellSize * 3);
-        button.setY(Gdx.graphics.getHeight() - cellSize * 3);
-        button.setWidth(cellSize * 3);
-        button.setHeight(cellSize * 3);
-        stage.addActor(button);
-        button.addListener(new EventListener() {
+        buttonP = new TextButton(new String(), style);
+        buttonP.setText("Silicon P");
+        buttonP.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        buttonP.setY(Gdx.graphics.getHeight() - cellSize * 3);
+        buttonP.setWidth(cellSize * 3);
+        buttonP.setHeight(cellSize * 3);
+        buttonC = new TextButton(new String(), style);
+        buttonC.setText("Silicon S");
+        buttonC.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        buttonC.setY(Gdx.graphics.getHeight() - cellSize * 6);
+        buttonC.setWidth(cellSize * 3);
+        buttonC.setHeight(cellSize * 3);
+        buttonM = new TextButton(new String(), style);
+        buttonM.setText("Metal");
+        buttonM.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        buttonM.setY(Gdx.graphics.getHeight() - cellSize * 9);
+        buttonM.setWidth(cellSize * 3);
+        buttonM.setHeight(cellSize * 3);
+        viabutton = new TextButton(new String(), style);
+        viabutton.setText("Add via");
+        viabutton.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        viabutton.setY(Gdx.graphics.getHeight() - cellSize * 12);
+        viabutton.setWidth(cellSize * 3);
+        viabutton.setHeight(cellSize * 3);
+        stage.addActor(buttonP);
+        stage.addActor(buttonC);
+        stage.addActor(buttonM);
+        stage.addActor(viabutton);
+        buttonP.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
-                if(event.toString().equals("touchDown")) {
+                if (event.toString().equals("touchDown")) {
+                    if (buttonP.getText().toString().equals("P - type"))
+                        buttonP.setText("Silicon P");
+                    else
+                        buttonP.setText("P - type");
+                }
+                return true;
+            }
+        });
+        buttonC.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if (event.toString().equals("touchDown")){
+                    if (buttonC.getText().toString().equals("S - type"))
+                        buttonC.setText("Silicon S");
+                    else
+                        buttonC.setText("S - type");
+                }
+                return true;
+            }
+        });
+        buttonM.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if (event.toString().equals("touchDown")){
+                    if (buttonM.getText().toString().equals("Set metal"))
+                        buttonM.setText("Metal");
+                    else
+                        buttonM.setText("Set metal");
+                }
+                return true;
+            }
+        });
+        viabutton.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if (event.toString().equals("touchDown")){
                     System.out.println("Kek");
-                    if(button.getText().toString().equals("Kek"))
-                        button.setText("Text");
-                    else {
-                        button.setText("Kek");
-                    }
+                    if (viabutton.getText().toString().equals("Via"))
+                        viabutton.setText("Add via");
+                    else
+                        viabutton.setText("Via");
                 }
                 return true;
             }
@@ -87,16 +141,62 @@ public class MainGameScreen implements Screen{
             }
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-                if(button.getText().toString().equals("Kek")){
+                if(buttonP.getText().toString().equals("P - type")){
                     switch(b) {
                         case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
-                        if (cell != null)
-                            new Silicon(cell, Silicon.Type.P);
+                            if (cell != null)
+                                new Silicon(cell, Silicon.Type.P);
                             break;
                         case Input.Buttons.RIGHT:
                             try{
                                 cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] = null;
+                                if(cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via)
+                                    cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
                             } catch (Exception e) {
+
+                            }
+                    }
+                }
+                if(buttonC.getText().toString().equals("S - type")){
+                    switch (b) {
+                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
+                            if (cell != null)
+                                new Silicon(cell, Silicon.Type.N);
+                            break;
+                        case Input.Buttons.RIGHT:
+                            try{
+                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] = null;
+                                if(cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via)
+                                    cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
+                            } catch (Exception e){
+
+                            }
+                    }
+                }
+                if(buttonM.getText().toString().equals("Set metal")){
+                    switch (b) {
+                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
+                            if(cell != null)
+                                new Metal(cell);
+                            break;
+                        case Input.Buttons.RIGHT:
+                            try{
+                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[2] = null;
+                            } catch (Exception e){
+
+                            }
+                    }
+                }
+                if(viabutton.getText().toString().equals("Via")){
+                    switch (b) {
+                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
+                            if (cell != null && ((cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] != null) || (cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[2] != null)))
+                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = true;
+                            break;
+                        case Input.Buttons.RIGHT:
+                            try{
+                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
+                            } catch (Exception e){
 
                             }
                     }
@@ -145,6 +245,12 @@ public class MainGameScreen implements Screen{
     public void renderGui(){
         renderer.setColor(Color.RED);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3, cellSize * 3, cellSize * 3);
+        renderer.setColor(Color.YELLOW);
+        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 6 - 1, cellSize * 3, cellSize * 3);
+        renderer.setColor(Color.DARK_GRAY);
+        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 9 - 2, cellSize * 3, cellSize * 3);
+        renderer.setColor(Color.NAVY);
+        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 12 - 3, cellSize * 3, cellSize * 3);
     }
     public void renderConstruction(float sx, float sy){
         renderer.translate(sx, sy, 0);
