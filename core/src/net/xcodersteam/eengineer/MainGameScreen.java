@@ -7,9 +7,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Silicon;
@@ -24,17 +23,24 @@ public class MainGameScreen implements Screen{
     }
     ConstructionManager cm;
     SpriteBatch batch;
-    //Texture img;
     ShapeRenderer renderer;
     TextButton buttonP;
     TextButton buttonC;
     TextButton buttonM;
     TextButton viabutton;
     Stage stage;
+    ButtonGroup group;
+    public void setButton(TextButton button, float x){
+        group.add(button);
+        button.setWidth(cellSize * 3);
+        button.setHeight(cellSize * 3);
+        button.setX(Gdx.graphics.getWidth() - cellSize * 3);
+        button.setY(Gdx.graphics.getHeight() - cellSize * x);
+        stage.addActor(button);
+    }
     public  MainGameScreen () {
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        //img = new Texture("badlogic.jpg");
         cm = new ConstructionManager(16, 16);
         stage = new Stage();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
@@ -43,197 +49,164 @@ public class MainGameScreen implements Screen{
         generator.dispose();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = font;
+        group = new ButtonGroup();
         buttonP = new TextButton(new String(), style);
         buttonP.setText("Silicon P");
-        buttonP.setX(Gdx.graphics.getWidth() - cellSize * 3);
-        buttonP.setY(Gdx.graphics.getHeight() - cellSize * 3);
-        buttonP.setWidth(cellSize * 3);
-        buttonP.setHeight(cellSize * 3);
+        setButton(buttonP, 3);
         buttonC = new TextButton(new String(), style);
+        setButton(buttonC, 6);
         buttonC.setText("Silicon S");
-        buttonC.setX(Gdx.graphics.getWidth() - cellSize * 3);
-        buttonC.setY(Gdx.graphics.getHeight() - cellSize * 6);
-        buttonC.setWidth(cellSize * 3);
-        buttonC.setHeight(cellSize * 3);
         buttonM = new TextButton(new String(), style);
+        setButton(buttonM, 9);
         buttonM.setText("Metal");
-        buttonM.setX(Gdx.graphics.getWidth() - cellSize * 3);
-        buttonM.setY(Gdx.graphics.getHeight() - cellSize * 9);
-        buttonM.setWidth(cellSize * 3);
-        buttonM.setHeight(cellSize * 3);
         viabutton = new TextButton(new String(), style);
+        setButton(viabutton, 12);
         viabutton.setText("Add via");
-        viabutton.setX(Gdx.graphics.getWidth() - cellSize * 3);
-        viabutton.setY(Gdx.graphics.getHeight() - cellSize * 12);
-        viabutton.setWidth(cellSize * 3);
-        viabutton.setHeight(cellSize * 3);
-        stage.addActor(buttonP);
-        stage.addActor(buttonC);
-        stage.addActor(buttonM);
-        stage.addActor(viabutton);
-        buttonP.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event.toString().equals("touchDown")) {
-                    if (buttonP.getText().toString().equals("P - type"))
-                        buttonP.setText("Silicon P");
-                    else
-                        buttonP.setText("P - type");
-                }
-                return true;
-            }
-        });
-        buttonC.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event.toString().equals("touchDown")){
-                    if (buttonC.getText().toString().equals("S - type"))
-                        buttonC.setText("Silicon S");
-                    else
-                        buttonC.setText("S - type");
-                }
-                return true;
-            }
-        });
-        buttonM.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event.toString().equals("touchDown")){
-                    if (buttonM.getText().toString().equals("Set metal"))
-                        buttonM.setText("Metal");
-                    else
-                        buttonM.setText("Set metal");
-                }
-                return true;
-            }
-        });
-        viabutton.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event.toString().equals("touchDown")){
-                    System.out.println("Kek");
-                    if (viabutton.getText().toString().equals("Via"))
-                        viabutton.setText("Add via");
-                    else
-                        viabutton.setText("Via");
-                }
-                return true;
-            }
-        });
-        Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputProcessor() {
-            @Override
-            public boolean keyDown(int keycode) {
-                return false;
-            }
-
-            @Override
-            public boolean keyUp(int keycode) {
-                return false;
-            }
-
-            @Override
-            public boolean keyTyped(char character) {
-                return false;
-            }
-
-            public Cell getCellAt(int screenX, int screenY) {
-                return cm.getCell((screenX - 100) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1));
-            }
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-                if(buttonP.getText().toString().equals("P - type")){
-                    switch(b) {
-                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
-                            if (cell != null)
-                                new Silicon(cell, Silicon.Type.P);
-                            break;
-                        case Input.Buttons.RIGHT:
-                            try{
-                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] = null;
-                                if(cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via)
-                                    cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
-                            } catch (Exception e) {
-
-                            }
+        group.uncheckAll();
+        buttonP.addListener(new ButtonChangeListener(buttonP, "Silicon P", "P - type"));
+        buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon S", "S - type"));
+        buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "Set metal"));
+        viabutton.addListener(new ButtonChangeListener(viabutton, "Add via", "Via"));
+                Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputProcessor() {
+                    @Override
+                    public boolean keyDown(int keycode) {
+                        return false;
                     }
-                }
-                if(buttonC.getText().toString().equals("S - type")){
-                    switch (b) {
-                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
-                            if (cell != null)
-                                new Silicon(cell, Silicon.Type.N);
-                            break;
-                        case Input.Buttons.RIGHT:
-                            try{
-                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] = null;
-                                if(cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via)
-                                    cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
-                            } catch (Exception e){
 
-                            }
+                    @Override
+                    public boolean keyUp(int keycode) {
+                        return false;
                     }
-                }
-                if(buttonM.getText().toString().equals("Set metal")){
-                    switch (b) {
-                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
-                            if(cell != null)
-                                new Metal(cell);
-                            break;
-                        case Input.Buttons.RIGHT:
-                            try{
-                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[2] = null;
-                            } catch (Exception e){
 
-                            }
+                    @Override
+                    public boolean keyTyped(char character) {
+                        return false;
                     }
-                }
-                if(viabutton.getText().toString().equals("Via")){
-                    switch (b) {
-                        case Input.Buttons.LEFT: Cell cell = getCellAt(screenX, screenY);
-                            if (cell != null && ((cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[1] != null) || (cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].layers[2] != null)))
-                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = true;
-                            break;
-                        case Input.Buttons.RIGHT:
-                            try{
-                                cm.construction[(screenX - 100) / (cellSize + 1)][(Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1)].via = false;
-                            } catch (Exception e){
 
-                            }
+                    public Cell getCellAt(int screenX, int screenY) {
+                        return cm.getCell((screenX - 100) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1));
                     }
-                }
-                return true;
-            }
+                    public int getCellX(int screenX){
+                        return (screenX - 100) / (cellSize + 1);
+                    }
+                    public int getCellY(int screenY){
+                        return (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1);
+                    }
 
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                return false;
-            }
+                    @Override
+                    public boolean touchDown(int screenX, int screenY, int pointer, int b) {
+                        switch (group.getCheckedIndex()) {
+                            case 0:
+                                switch (b) {
+                                    case Input.Buttons.LEFT:
+                                        Cell cell = getCellAt(screenX, screenY);
+                                        if (cell != null)
+                                            new Silicon(cell, Silicon.Type.P);
+                                        break;
+                                    case Input.Buttons.RIGHT:
+                                        getCellAt(screenX, screenY).layers[1] = null;
+                                        if (getCellAt(screenX, screenY).via)
+                                            getCellAt(screenX, screenY).via = false;
+                                }
+                                break;
+                            case 1:
+                                switch (b) {
+                                    case Input.Buttons.LEFT:
+                                        Cell cell = getCellAt(screenX, screenY);
+                                        if (cell != null)
+                                            new Silicon(cell, Silicon.Type.N);
+                                        break;
+                                    case Input.Buttons.RIGHT:
+                                        getCellAt(screenX, screenY).layers[1] = null;
+                                        if (getCellAt(screenX, screenY).via)
+                                            getCellAt(screenX, screenY).via = false;
+                                        break;
 
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                return false;
-            }
+                                }
+                                break;
+                            case 2:
+                                switch (b) {
+                                    case Input.Buttons.LEFT:
+                                        Cell cell = getCellAt(screenX, screenY);
+                                        if (cell != null)
+                                            new Metal(cell);
+                                        break;
+                                    case Input.Buttons.RIGHT:
+                                        getCellAt(screenX, screenY).layers[2] = null;
+                                }
+                                break;
+                            case 3:
+                                switch (b) {
+                                    case Input.Buttons.LEFT:
+                                        Cell cell = getCellAt(screenX, screenY);
+                                        if (cell != null && ((getCellAt(screenX, screenY).layers[1] != null) || (getCellAt(screenX, screenY).layers[2] != null)))
+                                            getCellAt(screenX, screenY).via = true;
+                                        break;
+                                    case Input.Buttons.RIGHT:
+                                        getCellAt(screenX, screenY).via = false;
+                                }
+                                break;
+                        }
+                        lastScreenX = screenX;
+                        lastScreenY = screenY;
+                        lastCellX = getCellX(screenX);
+                        lastCellY = getCellY(screenY);
+                        return true;
+                    }
 
-            @Override
-            public boolean mouseMoved(int screenX, int screenY) {
-                return false;
-            }
+                    @Override
+                    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                        return false;
+                    }
+                    public int lastScreenX;
+                    public int lastScreenY;
+                    public int lastCellY;
+                    public int lastCellX;
+                    @Override
+                    public boolean touchDragged(int screenX, int screenY, int pointer) {
+                        int deltaX = getCellX(screenX) - lastCellX;
+                        int deltaY = getCellY(screenY) - lastCellY;
+                        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+                            //int deltaX = screenX - lastScreenX;
+                            //int deltaY = screenY - lastScreenY;
+                            byte dir = 0;
+                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                if (deltaX > 0)
+                                    dir = 2;
+                                else
+                                    dir = 8;
+                            } else {
+                                if (deltaY > 0)
+                                    dir = 1;
+                                else
+                                    dir = 4;
+                            }
+                            lastCellX = getCellX(screenX);
+                            lastCellY = getCellY(screenY);
+                        }
+                        lastScreenX = screenX;
+                        lastScreenY = screenY;
+                        return true;
+                    }
 
-            @Override
-            public boolean scrolled(int amount) {
-                return false;
-            }
-        }));
+                    @Override
+                    public boolean mouseMoved(int screenX, int screenY) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean scrolled(int amount) {
+                        return false;
+                    }
+                }));
     }
 
     private final int cellSize = 20;
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        //batch.begin();
-        //batch.draw(img, 0, 0);
-        //batch.end();
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setAutoShapeType(true);
         renderConstruction(100, 100);
