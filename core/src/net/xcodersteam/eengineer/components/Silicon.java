@@ -10,25 +10,13 @@ import net.xcodersteam.eengineer.GirdComponent;
 public class Silicon extends GirdComponent{
     public Type type;
     public enum Type{
-        N(Color.YELLOW),P(Color.RED),NP(Color.MAGENTA),PN(Color.MAROON);
+        N(Color.YELLOW),P(Color.RED);
         public Color color;
         private Type(Color c){
             color = c;
         }
-        public Type combine(Type type1){
-            try {
-                return Type.valueOf(this.name() + type1.name());
-            } catch (IllegalArgumentException e){
-                return type1;
-            }
-        }
     }
-    public Silicon(Cell cell, Type type) {
-        Silicon sc = (Silicon) cell.layers[getLayer()];
-        if(sc != null && sc.type != null){
-            type = sc.type.combine(type);
-        }
-        cell.put(this);
+    public Silicon(Type type) {
         this.type = type;
     }
 
