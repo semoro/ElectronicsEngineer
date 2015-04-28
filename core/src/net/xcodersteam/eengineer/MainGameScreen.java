@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Silicon;
+import net.xcodersteam.eengineer.components.Transistor;
 
 /**
  * Created by fantasyday on 21.04.2015.
@@ -92,6 +93,17 @@ public class MainGameScreen implements Screen{
                     public int getCellY(int screenY){
                         return (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1);
                     }
+                    public void addSilicon(int screenX, int screenY, Silicon.Type type) {
+                        Cell cell = getCellAt(screenX, screenY);
+                        if (cell.layers[1] != null && cell.layers[1] instanceof Silicon && ((Silicon) cell.layers[1]).type != type) {
+                            if (type == Silicon.Type.N)
+                                cell.layers[1] = new Transistor(Transistor.Type.NpN);
+                            else
+                                cell.layers[1] = new Transistor(Transistor.Type.PnP);
+                        } else {
+                            cell.layers[1] = new Silicon(type);
+                        }
+                    }
 
                     @Override
                     public boolean touchDown(int screenX, int screenY, int pointer, int b) {
@@ -101,7 +113,7 @@ public class MainGameScreen implements Screen{
                                     case Input.Buttons.LEFT:
                                         Cell cell = getCellAt(screenX, screenY);
                                         if (cell != null)
-                                            new Silicon(cell, Silicon.Type.P);
+                                            addSilicon(screenX, screenY, Silicon.Type.P);
                                         break;
                                     case Input.Buttons.RIGHT:
                                         getCellAt(screenX, screenY).layers[1] = null;
@@ -114,7 +126,7 @@ public class MainGameScreen implements Screen{
                                     case Input.Buttons.LEFT:
                                         Cell cell = getCellAt(screenX, screenY);
                                         if (cell != null)
-                                            new Silicon(cell, Silicon.Type.N);
+                                            addSilicon(screenX, screenY, Silicon.Type.N);
                                         break;
                                     case Input.Buttons.RIGHT:
                                         getCellAt(screenX, screenY).layers[1] = null;
@@ -172,7 +184,7 @@ public class MainGameScreen implements Screen{
                             byte dir = 0;
                             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                                 if (deltaX > 0)
-                                    dir = 2;
+                                    dir = 2; // cm.construction.connection & 01
                                 else
                                     dir = 8;
                             } else {

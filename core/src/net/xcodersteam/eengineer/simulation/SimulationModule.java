@@ -5,7 +5,7 @@ import net.xcodersteam.eengineer.Cell;
 import net.xcodersteam.eengineer.GirdComponent;
 import net.xcodersteam.eengineer.components.Pin;
 import net.xcodersteam.eengineer.components.Pin.PinType;
-import net.xcodersteam.eengineer.components.Tranzistor;
+import net.xcodersteam.eengineer.components.Transistor;
 
 public class SimulationModule {
 	List<Pin> pins;
@@ -40,7 +40,7 @@ public class SimulationModule {
 		}
 		GirdComponent from=cells[x][y].layers[1];
 		if(from!=null){
-			if(from instanceof Tranzistor){
+			if(from instanceof Transistor){
 				if(gates[x][y]==null){
 					ComponentGate gate=new ComponentGate();
 					gates[x][y]=gate;

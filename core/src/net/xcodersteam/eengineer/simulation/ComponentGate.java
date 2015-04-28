@@ -1,10 +1,9 @@
 package net.xcodersteam.eengineer.simulation;
 
-import java.util.Set;
-import net.xcodersteam.eengineer.components.Tranzistor;
+import net.xcodersteam.eengineer.components.Transistor;
 
 public class ComponentGate {
-	Tranzistor.Type type;
+	Transistor.Type type;
 	ComponentClaster Na;
 	ComponentClaster Nb;
 	ComponentClaster Pa;

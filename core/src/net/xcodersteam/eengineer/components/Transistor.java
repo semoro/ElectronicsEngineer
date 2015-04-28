@@ -3,7 +3,7 @@ package net.xcodersteam.eengineer.components;
 import com.badlogic.gdx.graphics.Color;
 import net.xcodersteam.eengineer.GirdComponent;
 
-public class Tranzistor extends GirdComponent {
+public class Transistor extends GirdComponent {
 	Type type;
 	public enum Type{
 		PnP(Color.MAROON),NpN(Color.MAGENTA);
@@ -13,7 +13,7 @@ public class Tranzistor extends GirdComponent {
         }
 	}
 	
-	public Tranzistor(Type type) {
+	public Transistor(Type type) {
         this.type = type;
     }
 
