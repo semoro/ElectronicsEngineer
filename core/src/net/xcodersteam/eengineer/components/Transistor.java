@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import net.xcodersteam.eengineer.GirdComponent;
 
 public class Transistor extends GirdComponent {
-	Type type;
+	public Type type;
 	public enum Type{
 		PnP(Color.MAROON),NpN(Color.MAGENTA);
 		public Color color;

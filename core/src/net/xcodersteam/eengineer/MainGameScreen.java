@@ -53,19 +53,23 @@ public class MainGameScreen implements Screen{
         group = new ButtonGroup();
         buttonP = new TextButton(new String(), style);
         buttonP.setText("Silicon P");
+        buttonP.setUserObject(new PSiliconTool());
         setButton(buttonP, 3);
         buttonC = new TextButton(new String(), style);
+        buttonC.setText("Silicon N");
+        buttonC.setUserObject(new NSiliconTool());
         setButton(buttonC, 6);
-        buttonC.setText("Silicon S");
         buttonM = new TextButton(new String(), style);
-        setButton(buttonM, 9);
         buttonM.setText("Metal");
+        buttonM.setUserObject(new MetalTool());
+        setButton(buttonM, 9);
         viabutton = new TextButton(new String(), style);
-        setButton(viabutton, 12);
         viabutton.setText("Add via");
+        viabutton.setUserObject(new ViaTool());
+        setButton(viabutton, 12);
         group.uncheckAll();
         buttonP.addListener(new ButtonChangeListener(buttonP, "Silicon P", "P - type"));
-        buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon S", "S - type"));
+        buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "N - type"));
         buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "Set metal"));
         viabutton.addListener(new ButtonChangeListener(viabutton, "Add via", "Via"));
                 Gdx.input.setInputProcessor(new InputMultiplexer(stage, new InputProcessor() {
@@ -107,7 +111,7 @@ public class MainGameScreen implements Screen{
 
                     @Override
                     public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-                        switch (group.getCheckedIndex()) {
+                        /*switch (group.getCheckedIndex()) {
                             case 0:
                                 switch (b) {
                                     case Input.Buttons.LEFT:
@@ -158,7 +162,10 @@ public class MainGameScreen implements Screen{
                                         getCellAt(screenX, screenY).via = false;
                                 }
                                 break;
-                        }
+                        }*/
+                        Cell c = cm.getCell(getCellX(screenX), getCellY(screenY));
+                        if(c != null)
+                            ((LineTool) group.getChecked().getUserObject()).perform(c);
                         lastScreenX = screenX;
                         lastScreenY = screenY;
                         lastCellX = getCellX(screenX);
@@ -184,7 +191,7 @@ public class MainGameScreen implements Screen{
                             byte dir = 0;
                             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                                 if (deltaX > 0)
-                                    dir = 2; // cm.construction.connection & 01
+                                    dir = 2;
                                 else
                                     dir = 8;
                             } else {
@@ -192,6 +199,18 @@ public class MainGameScreen implements Screen{
                                     dir = 1;
                                 else
                                     dir = 4;
+                            }
+                            Cell lastCell = cm.construction[lastCellX][lastCellY];
+                            LineTool tool = (LineTool) group.getChecked().getUserObject();
+                            if(lastCell != null) {
+                                Cell cell = cm.getCell(getCellX(screenX), getCellY(screenY));
+                                if(cell != null){
+                                    tool.perform(cell);
+                                    if (tool.isLineAble(lastCell, getCellAt(lastScreenX, lastScreenY))) {
+                                        tool.setConnection((byte) (dir | tool.getConnection(lastCell)), lastCell);
+                                        tool.setConnection((byte) (dir << 2 > 8 ? dir >> 2 : dir << 2 | tool.getConnection(cell)), cell);
+                                }
+                            }
                             }
                             lastCellX = getCellX(screenX);
                             lastCellY = getCellY(screenY);
