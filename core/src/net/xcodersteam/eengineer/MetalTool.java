@@ -29,4 +29,11 @@ public class MetalTool extends LineTool {
     public byte getConnection(Cell c) {
         return c.layers[2].connection;
     }
+
+    @Override
+    public boolean delete(Cell cell) {
+        if(cell != null)
+            cell.layers[2] = null;
+        return true;
+    }
 }

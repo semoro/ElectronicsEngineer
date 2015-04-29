@@ -6,7 +6,8 @@ package net.xcodersteam.eengineer;
 public class ViaTool extends LineTool {
     @Override
     public boolean perform(Cell cell) {
-        cell.via = true;
+        if(cell.layers[1] != null || cell.layers[2] != null)
+            cell.via = true;
         return true;
     }
 
@@ -23,5 +24,12 @@ public class ViaTool extends LineTool {
     @Override
     public byte getConnection(Cell c) {
         return 0;
+    }
+
+    @Override
+    public boolean delete(Cell cell) {
+        if(cell != null)
+            cell.via = false;
+        return true;
     }
 }

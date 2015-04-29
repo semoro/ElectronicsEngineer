@@ -9,9 +9,11 @@ import net.xcodersteam.eengineer.components.Transistor;
 public class NSiliconTool extends LineTool {
     @Override
     public boolean perform(Cell cell) {
-        if(cell.layers[1] != null && cell.layers[1] instanceof Silicon && ((Silicon) cell.layers[1]).type != Silicon.Type.N)
+        if(cell.layers[1] != null && cell.layers[1] instanceof Silicon && ((Silicon) cell.layers[1]).type != Silicon.Type.N) {
+            byte b = cell.layers[1].connection;
             cell.layers[1] = new Transistor(Transistor.Type.PnP);
-        else if(cell.layers[1] == null)
+            cell.layers[1].connection = b;
+        } else if(cell.layers[1] == null)
             cell.layers[1] = new Silicon(Silicon.Type.N);
         else
             return false;
@@ -25,11 +27,18 @@ public class NSiliconTool extends LineTool {
 
     @Override
     public void setConnection(byte b, Cell c) {
-
+        c.layers[1].connection = b;
     }
 
     @Override
     public byte getConnection(Cell c) {
-        return 0;
+        return c.layers[1].connection;
+    }
+
+    @Override
+    public boolean delete(Cell cell) {
+        if(cell != null)
+            cell.layers[1] = null;
+        return true;
     }
 }
