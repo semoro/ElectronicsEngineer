@@ -9,9 +9,21 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.io.IOException;
+
 public class EEngineerGame extends Game {
-	@Override
+    public EEngineerGame() {
+
+    }
+
+    @Override
 	public void create() {
-		this.setScreen(new MainGameScreen());
-	}
+        try {
+            this.setScreen(new MainGameScreen());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

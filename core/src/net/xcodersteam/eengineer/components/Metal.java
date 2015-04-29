@@ -7,12 +7,13 @@ import net.xcodersteam.eengineer.GirdComponent;
 /**
  * Created by fantasyday on 19.04.2015.
  */
-public class Metal extends GirdComponent{
+public class Metal extends GirdComponent {
     Cell cell;
     public Metal(Cell cell) {
         cell.put(this);
         this.cell = cell;
     }
+    public Metal(){}
 
     @Override
     public Color getColor() {

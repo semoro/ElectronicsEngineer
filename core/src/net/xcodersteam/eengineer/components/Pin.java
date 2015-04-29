@@ -5,6 +5,7 @@ import net.xcodersteam.eengineer.GirdComponent;
 
 public class Pin extends GirdComponent {
 	public PinType pinType;
+    public Pin(){}
 	
 	public enum PinType{
 		IN,OUT;

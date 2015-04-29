@@ -12,6 +12,7 @@ public class Transistor extends GirdComponent {
             color = c;
         }
 	}
+    public Transistor(){}
 	
 	public Transistor(Type type) {
         this.type = type;

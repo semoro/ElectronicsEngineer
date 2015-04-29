@@ -16,6 +16,9 @@ import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Silicon;
 import net.xcodersteam.eengineer.components.Transistor;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Created by fantasyday on 21.04.2015.
  */
@@ -44,10 +47,15 @@ public class MainGameScreen implements Screen{
         button.setY(Gdx.graphics.getHeight() - cellSize * x - 35);
         stage.addActor(button);
     }
-    public  MainGameScreen () {
+    public  MainGameScreen () throws IOException, ClassNotFoundException {
         batch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        cm = new ConstructionManager(16, 16);
+        File save = new File("current.sv");
+        if(save.exists()){
+            cm = new ConstructionManager(save);
+        } else {
+            cm = new ConstructionManager(16, 16);
+        }
         stage = new Stage();
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -88,6 +96,11 @@ public class MainGameScreen implements Screen{
             @Override
             public boolean handle(Event event) {
                 if(event.toString().equals("touchDown")){
+                    try {
+                        cm.save(new File("current.sv"));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     Gdx.app.exit();
                 }
                 return true;
@@ -140,21 +153,23 @@ public class MainGameScreen implements Screen{
 
                     @Override
                     public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-                        click = b;
-                        Cell c = cm.getCell(getCellX(screenX), getCellY(screenY));
-                        if(c != null) {
-                            if(click == Input.Buttons.LEFT)
-                                ((LineTool) group.getChecked().getUserObject()).perform(c);
-                            else if (click == Input.Buttons.RIGHT) {
-                                deleteConnection(getCellX(screenX), getCellY(screenY), (LineTool) group.getChecked().getUserObject());
-                                ((LineTool) group.getChecked().getUserObject()).delete(c);
+                        try {
+                            click = b;
+                            Cell c = cm.getCell(getCellX(screenX), getCellY(screenY));
+                            if (c != null) {
+                                if (click == Input.Buttons.LEFT)
+                                    ((LineTool) group.getChecked().getUserObject()).perform(c);
+                                else if (click == Input.Buttons.RIGHT) {
+                                    deleteConnection(getCellX(screenX), getCellY(screenY), (LineTool) group.getChecked().getUserObject());
+                                    ((LineTool) group.getChecked().getUserObject()).delete(c);
+                                    cm.cleanUp(getCellX(screenX), getCellY(screenY));
+                                }
                             }
-                        }
-                        lastScreenX = screenX;
-                        lastScreenY = screenY;
-                        lastCellX = getCellX(screenX);
-                        lastCellY = getCellY(screenY);
-
+                            lastScreenX = screenX;
+                            lastScreenY = screenY;
+                            lastCellX = getCellX(screenX);
+                            lastCellY = getCellY(screenY);
+                        } catch(Exception e){}
                         return true;
                     }
                     int click;
@@ -207,6 +222,7 @@ public class MainGameScreen implements Screen{
                                     int cellY = getCellY(screenY);
                                     deleteConnection(cellX, cellY, tool);
                                     tool.delete(cell);
+                                    cm.cleanUp(cellX, cellY);
                                 }
                             } catch (Exception e){}
                             lastCellX = getCellX(screenX);

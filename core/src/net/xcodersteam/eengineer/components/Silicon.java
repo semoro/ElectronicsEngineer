@@ -19,6 +19,7 @@ public class Silicon extends GirdComponent{
     public Silicon(Type type) {
         this.type = type;
     }
+    public Silicon(){}
 
     @Override
     public Color getColor() {
