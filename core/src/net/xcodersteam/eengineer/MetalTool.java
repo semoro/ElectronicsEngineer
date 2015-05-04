@@ -33,7 +33,10 @@ public class MetalTool extends LineTool {
     @Override
     public boolean delete(Cell cell) {
         if(cell != null)
-            cell.layers[2] = null;
+            if(!cell.layers[2].locked)
+                cell.layers[2] = null;
+            else
+                return false;
         return true;
     }
 }

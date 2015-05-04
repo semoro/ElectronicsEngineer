@@ -18,7 +18,9 @@ public abstract class GirdComponent implements Serializable{
         renderer.setColor(getColor());
         drawStandartRect(renderer,w,h);
     }
+    public boolean locked=false;
 
+    public GirdComponent lock(boolean b){ this.locked=b; return this;}
     public void renderSecondPass(Batch b,Cell c,int x, int y,int w,int h){}
     public void drawStandartRect(ShapeRenderer r,int w, int h){
         int borderTop = -(connection & 1) * 3;

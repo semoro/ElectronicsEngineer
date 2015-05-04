@@ -10,17 +10,7 @@ public class ConstructionManager {
     public final Cell[][] construction;
     public final int height;
     public final int width;
-    public ConstructionManager(File file) throws IOException, ClassNotFoundException {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-            width = ois.readInt();
-            height = ois.readInt();
-            construction = new Cell[width][height];
-            while(ois.available() > 0){
-                int x = ois.readInt();
-                int y = ois.readInt();
-                construction[x][y] = (Cell) ois.readObject();
-            }
-    }
+
     public ConstructionManager(int height, int width) {
         this.height = height;
         this.width = width;
@@ -66,11 +56,15 @@ public class ConstructionManager {
             construction[x][y] = null;
         }
     }
-    public void save(File output) throws IOException {
+
+    public void load(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        while(ois.available()>0){
+            construction[ois.readInt()][ois.readInt()]= (Cell) ois.readObject();
+        }
+    }
+
+    public void save(ObjectOutputStream oos) throws IOException {
         cleanUp();
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output));
-        oos.writeInt(width);
-        oos.writeInt(height);
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
                 if(construction[x][y] != null){
