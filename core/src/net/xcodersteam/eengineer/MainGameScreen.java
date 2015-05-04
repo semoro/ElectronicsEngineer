@@ -81,7 +81,7 @@ public class MainGameScreen implements Screen {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        File save = new File("current.sv");
+        final File save = new File("current.sv");
         if (save.exists()) {
             task=new TaskLoader(save);
             cm=task.load();
