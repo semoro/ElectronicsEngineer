@@ -6,7 +6,6 @@ import java.io.IOException;
 
 public class EEngineerGame extends Game {
     public EEngineerGame() {
-
     }
 
     @Override

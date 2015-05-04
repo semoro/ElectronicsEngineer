@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import net.xcodersteam.eengineer.components.Pin;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,6 +43,9 @@ public class MainGameScreen implements Screen {
     public static BitmapFont font;
     public static int x = 100;
     public static int y = 100;
+    TaskLoader task;
+
+
 
     public void setButton(TextButton button, float x) {
         group.add(button);
@@ -51,7 +56,24 @@ public class MainGameScreen implements Screen {
         stage.addActor(button);
     }
 
+    JFileChooser fileChooser;
     public MainGameScreen() throws IOException, ClassNotFoundException {
+        fileChooser=new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("."));
+        fileChooser.addChoosableFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().endsWith(".task") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Файл задания";
+            }
+        });
+        fileChooser.setDialogTitle("Задание");
+
+                fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         font = generator.generateFont(parameter);
@@ -61,11 +83,16 @@ public class MainGameScreen implements Screen {
         renderer = new ShapeRenderer();
         File save = new File("current.sv");
         if (save.exists()) {
-            cm = new ConstructionManager(save);
+            task=new TaskLoader(save);
+            cm=task.load();
         } else {
-            cm = new ConstructionManager(16, 16);
+            fileChooser.showOpenDialog(null);
+            if(fileChooser.getSelectedFile()!=null) {
+                task = new TaskLoader(fileChooser.getSelectedFile());
+                cm = task.init();
+            }else
+                Gdx.app.exit();
         }
-        cm.getCell(2,2).put(new Pin("VCC"));
         stage = new Stage();
 
         style.font = font;
@@ -98,12 +125,13 @@ public class MainGameScreen implements Screen {
         buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "N - type"));
         buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "Set metal"));
         viabutton.addListener(new ButtonChangeListener(viabutton, "Add via", "Via"));
+
         close.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
                 if (event.toString().equals("touchDown")) {
                     try {
-                        cm.save(new File("current.sv"));
+                        task.save(save,cm);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -289,9 +317,8 @@ public class MainGameScreen implements Screen {
                 if (c != null) {
                     if (click == Input.Buttons.LEFT)
                         ((LineTool) group.getChecked().getUserObject()).perform(c);
-                    else if (click == Input.Buttons.RIGHT) {
+                    else if (click == Input.Buttons.RIGHT && ((LineTool) group.getChecked().getUserObject()).delete(c)) {
                         deleteConnection(getCellX(screenX), getCellY(screenY), (LineTool) group.getChecked().getUserObject());
-                        ((LineTool) group.getChecked().getUserObject()).delete(c);
                         cm.cleanUp(getCellX(screenX), getCellY(screenY));
                     }
                 }
@@ -355,9 +382,10 @@ public class MainGameScreen implements Screen {
                         Cell cell = getCellAt(screenX, screenY);
                         int cellX = getCellX(screenX);
                         int cellY = getCellY(screenY);
-                        deleteConnection(cellX, cellY, tool);
-                        tool.delete(cell);
-                        cm.cleanUp(cellX, cellY);
+                        if(tool.delete(cell)) {
+                            deleteConnection(cellX, cellY, tool);
+                            cm.cleanUp(cellX, cellY);
+                        }
                     }
                 } catch (Exception e) {
                 }

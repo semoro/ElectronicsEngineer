@@ -14,9 +14,9 @@ import net.xcodersteam.eengineer.MainGameScreen;
 public class Pin extends GirdComponent {
 	public PinType pinType;
 	String name;
-    public Pin(String name){this(); this.name=name;  }
+    public Pin(String name){ this.name=name;  }
 	public Pin(){
-
+        locked=true;
     }
 	public enum PinType{
 		IN,OUT,VCC;
@@ -31,15 +31,14 @@ public class Pin extends GirdComponent {
 	public int getLayer() {
 		return 2;
 	}
-
-    GlyphLayout g;
+    transient GlyphLayout g;
     @Override
     public void renderSecondPass(Batch b, Cell c, int x, int y, int w, int h) {
         super.renderSecondPass(b, c, x, y, w, h);
 
         if(g==null)
-            g=MainGameScreen.font.draw(b, name, x, y);
+            g=MainGameScreen.font.draw(b, name, x+5, y);
         else
-            MainGameScreen.font.draw(b, name, x-g.width/2+w/2, y+g.height/2+h/2);
+            MainGameScreen.font.draw(b, name, x+5, y+g.height/2+h/2);
     }
 }

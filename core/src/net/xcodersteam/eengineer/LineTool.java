@@ -11,6 +11,6 @@ public abstract class LineTool {
     public abstract void setConnection(byte b, Cell c);
 
     public abstract byte getConnection(Cell c);
-
+    
     public abstract boolean delete(Cell cell);
 }
