@@ -35,8 +35,19 @@ public abstract class GirdComponent implements Serializable{
     }
     
     public void powerOn(Cell[][] cells, int x, int y){
+    	powerOn(cells, x, y, true);
+    }
+    
+    public void powerOn(Cell[][] cells, int x, int y, boolean via){
     	if(isPower){
     		return;
+    	}
+    	if(cells[x][y].via&&via){
+    		if(getLayer()==2){
+    			cells[x][y].layers[1].powerOn(cells, x, y, false);
+    		}else{
+    			cells[x][y].layers[2].powerOn(cells, x, y, false);
+    		}
     	}
     	if(cells[x][y].layers[getLayer()] instanceof Transistor){
     		Transistor t=((Transistor)cells[x][y].layers[getLayer()]);
