@@ -194,7 +194,7 @@ public class MainGameScreen implements Screen {
                     if (cm.construction[x][y].via) {
                         renderer.setColor(Color.BLACK);
                         renderer.set(ShapeRenderer.ShapeType.Line);
-                        renderer.circle(0,0, 7f);
+                        renderer.circle(cellSize / 2, cellSize / 2, 7f);
                         renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
                 }
