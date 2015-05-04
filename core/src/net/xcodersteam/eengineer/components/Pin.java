@@ -37,8 +37,8 @@ public class Pin extends GirdComponent {
         super.renderSecondPass(b, c, x, y, w, h);
 
         if(g==null)
-            g=MainGameScreen.font.draw(b, name, x, y);
+            g=MainGameScreen.font.draw(b, name, x+5, y);
         else
-            MainGameScreen.font.draw(b, name, x-g.width/2+w/2, y+g.height/2+h/2);
+            MainGameScreen.font.draw(b, name, x+5, y+g.height/2+h/2);
     }
 }

@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import net.xcodersteam.eengineer.components.Pin;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
 
@@ -42,6 +44,9 @@ public class MainGameScreen implements Screen {
     public static int x = 100;
     public static int y = 100;
     TaskLoader task;
+
+
+
     public void setButton(TextButton button, float x) {
         group.add(button);
         button.setWidth(cellSize * 3);
@@ -51,7 +56,24 @@ public class MainGameScreen implements Screen {
         stage.addActor(button);
     }
 
+    JFileChooser fileChooser;
     public MainGameScreen() throws IOException, ClassNotFoundException {
+        fileChooser=new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("."));
+        fileChooser.addChoosableFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().endsWith(".task") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Файл задания";
+            }
+        });
+        fileChooser.setDialogTitle("Задание");
+
+                fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         font = generator.generateFont(parameter);
@@ -64,8 +86,12 @@ public class MainGameScreen implements Screen {
             task=new TaskLoader(save);
             cm=task.load();
         } else {
-            task=new TaskLoader(new File("test.task"));
-            cm = task.init();
+            fileChooser.showOpenDialog(null);
+            if(fileChooser.getSelectedFile()!=null) {
+                task = new TaskLoader(fileChooser.getSelectedFile());
+                cm = task.init();
+            }else
+                Gdx.app.exit();
         }
         stage = new Stage();
 
