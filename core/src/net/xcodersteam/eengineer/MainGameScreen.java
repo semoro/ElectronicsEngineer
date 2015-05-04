@@ -42,7 +42,7 @@ public class MainGameScreen implements Screen {
     ButtonGroup group;
     public static BitmapFont font;
     public static int x = 100;
-    public static int y = 100;
+    public static int y = 200;
     TaskLoader task;
 
 
@@ -71,9 +71,23 @@ public class MainGameScreen implements Screen {
                 return "Файл задания";
             }
         });
-        fileChooser.setDialogTitle("Задание");
+        fileChooser.addChoosableFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.getName().endsWith(".sv") || f.isDirectory();
+            }
 
-                fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+            @Override
+            public String getDescription() {
+                return "Файл сохранения";
+            }
+        });
+        fileChooser.setDialogTitle("Задание");
+        fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
+        fileChooser.showOpenDialog(null);
+        if(fileChooser.getSelectedFile()==null)
+            Gdx.app.exit();
+
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         font = generator.generateFont(parameter);
@@ -81,17 +95,13 @@ public class MainGameScreen implements Screen {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        File save = new File("current.sv");
-        if (save.exists()) {
-            task=new TaskLoader(save);
-            cm=task.load();
+        File save = fileChooser.getSelectedFile();
+        if (save.getName().endsWith(".sv")) {
+            task = new TaskLoader(save);
+            cm = task.load();
         } else {
-            fileChooser.showOpenDialog(null);
-            if(fileChooser.getSelectedFile()!=null) {
-                task = new TaskLoader(fileChooser.getSelectedFile());
-                cm = task.init();
-            }else
-                Gdx.app.exit();
+            task = new TaskLoader(save);
+            cm = task.init();
         }
         stage = new Stage();
 
@@ -131,7 +141,26 @@ public class MainGameScreen implements Screen {
             public boolean handle(Event event) {
                 if (event.toString().equals("touchDown")) {
                     try {
-                        task.save(save,cm);
+                        JFileChooser fileChooser1=new JFileChooser();
+                        fileChooser1.removeChoosableFileFilter(fileChooser1.getAcceptAllFileFilter());
+                        fileChooser1.addChoosableFileFilter(new FileFilter() {
+                            @Override
+                            public boolean accept(File f) {
+                                return f.isDirectory() || f.getName().endsWith(".sv");
+                            }
+
+                            @Override
+                            public String getDescription() {
+                                return "Файл сохранения";
+                            }
+                        });
+                        fileChooser1.setCurrentDirectory(new File("./сохранения/"));
+                        fileChooser1.setSelectedFile(new File("./сохранения/текущее.sv"));
+
+                        fileChooser1.showSaveDialog(null);
+
+                        if(fileChooser1.getSelectedFile()!=null)
+                        task.save(fileChooser1.getSelectedFile(),cm);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -278,15 +307,15 @@ public class MainGameScreen implements Screen {
         }
 
         public Cell getCellAt(int screenX, int screenY) {
-            return cm.getCell((screenX - 100) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1));
+            return cm.getCell((screenX - x) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - x) / (cellSize + 1));
         }
 
         public int getCellX(int screenX) {
-            return (screenX - 100) / (cellSize + 1);
+            return (screenX - x) / (cellSize + 1);
         }
 
         public int getCellY(int screenY) {
-            return (Gdx.graphics.getHeight() - screenY - 100) / (cellSize + 1);
+            return (Gdx.graphics.getHeight() - screenY - y) / (cellSize + 1);
         }
 
         public void deleteConnection(int cellX, int cellY, LineTool tool) {
