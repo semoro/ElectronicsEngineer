@@ -12,9 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import net.xcodersteam.eengineer.components.Metal;
-import net.xcodersteam.eengineer.components.Silicon;
-import net.xcodersteam.eengineer.components.Transistor;
 
 import java.io.File;
 import java.io.IOException;

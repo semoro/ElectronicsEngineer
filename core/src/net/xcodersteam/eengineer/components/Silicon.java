@@ -1,7 +1,6 @@
 package net.xcodersteam.eengineer.components;
 
 import com.badlogic.gdx.graphics.Color;
-import net.xcodersteam.eengineer.Cell;
 import net.xcodersteam.eengineer.GirdComponent;
 
 /**
