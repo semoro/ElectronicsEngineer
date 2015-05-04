@@ -1,6 +1,8 @@
 package net.xcodersteam.eengineer.components;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import net.xcodersteam.eengineer.Cell;
 import net.xcodersteam.eengineer.GirdComponent;
 
 public class Transistor extends GirdComponent {
@@ -27,5 +29,7 @@ public class Transistor extends GirdComponent {
 	public int getLayer() {
 		return 1;
 	}
+
+
 
 }
