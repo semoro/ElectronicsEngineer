@@ -7,6 +7,8 @@ import net.xcodersteam.eengineer.GirdComponent;
 
 public class Transistor extends GirdComponent {
 	public Type type;
+	public boolean isOpened;
+	
 	public enum Type{
 		PnP(Color.MAROON),NpN(Color.MAGENTA);
 		public Color color;
@@ -18,6 +20,9 @@ public class Transistor extends GirdComponent {
 	
 	public Transistor(Type type) {
         this.type = type;
+        if(type==Type.PnP){
+        	isOpened=true;
+        }
     }
 
 	@Override
@@ -29,7 +34,4 @@ public class Transistor extends GirdComponent {
 	public int getLayer() {
 		return 1;
 	}
-
-
-
 }
