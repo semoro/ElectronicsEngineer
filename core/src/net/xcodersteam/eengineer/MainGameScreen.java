@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import net.xcodersteam.eengineer.components.Pin;
+import net.xcodersteam.eengineer.components.Silicon;
+import net.xcodersteam.eengineer.components.Transistor;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -45,6 +47,41 @@ public class MainGameScreen implements Screen {
     public static int y = 200;
     TaskLoader task;
 
+
+    public void simulate(int time){
+
+        for(Cell[] i:cm.construction){
+            for(Cell j:i){
+                if(j!=null) {
+                    for (GirdComponent c : j.layers) {
+                        if (c != null) {
+                            c.isPower = false;
+                        }
+                    }
+                }
+
+            }
+
+        }
+        for(int x=0;x<cm.width;x++)
+            for(int y=0;y<cm.height;y++)
+                if(cm.construction[x][y]!=null && cm.construction[x][y].layers[2] instanceof Pin && ((Pin) cm.construction[x][y].layers[2]).getState(time))
+                    cm.construction[x][y].layers[2].powerOn(cm.construction, x,y);
+
+
+        for(int i=0;i<cm.construction.length;i++){
+            for(int j=0;j<cm.construction[0].length;j++){
+                Cell c=cm.construction[i][j];
+                if(c!=null&&c.layers[1]!=null&&(c.layers[1] instanceof Transistor)){
+                    if(((Transistor)c.layers[1]).type== Transistor.Type.NpN){
+                        ((Transistor)c.layers[1]).isOpened=c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.P);
+                    }else{
+                        ((Transistor)c.layers[1]).isOpened=!c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.N);
+                    }
+                }
+            }
+        }
+    }
 
 
     public void setButton(TextButton button, float x) {
@@ -243,15 +280,25 @@ public class MainGameScreen implements Screen {
                 renderer.setColor(Color.valueOf("CCCCCC"));
                 renderer.rect(0, 0, cellSize, cellSize);
                 if (cm.construction[x][y] != null) {
+                    boolean d=false;
                     for (GirdComponent component : cm.construction[x][y].layers) {
                         if (component == null)
                             continue;
                         component.render(renderer, cm.construction[x][y], cellSize, cellSize);
+                        if(component.isPower)
+                            d=true;
                     }
                     if (cm.construction[x][y].via) {
                         renderer.setColor(Color.BLACK);
                         renderer.set(ShapeRenderer.ShapeType.Line);
                         renderer.circle(cellSize / 2, cellSize / 2, 7f);
+                        renderer.set(ShapeRenderer.ShapeType.Filled);
+                    }
+                    if(d){
+                        renderer.setColor(Color.BLACK);
+                        renderer.set(ShapeRenderer.ShapeType.Line);
+                        renderer.line(0, 0, cellSize, cellSize);
+                        renderer.line(0,cellSize,cellSize,0);
                         renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
                 }
@@ -298,7 +345,8 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean keyUp(int keycode) {
-            return false;
+            simulate(0);
+            return true;
         }
 
         @Override

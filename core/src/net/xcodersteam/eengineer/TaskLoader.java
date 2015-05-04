@@ -8,6 +8,7 @@ import net.xcodersteam.eengineer.components.Pin;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -31,7 +32,17 @@ public class TaskLoader {
                 p.pinType= Pin.PinType.VCC;
             else
                 p.pinType= Pin.PinType.valueOf(pinDef.getString("type"));
+
             createPin(cm, p, pinDef.getInt("x"), pinDef.getInt("y"));
+            if(p.pinType!= Pin.PinType.VCC) {
+                LinkedList<PinState> linkedList = new LinkedList<PinState>();
+                for (JsonValue jv:pinDef.get("state")){
+                    PinState ps=new PinState(jv.asInt());
+                    ps.up=jv.name.equalsIgnoreCase("1");
+                    linkedList.add(ps);
+                }
+                p.states=linkedList;
+            }
         });
 
         return cm;
@@ -71,7 +82,15 @@ public class TaskLoader {
             else
                 p.pinType= Pin.PinType.valueOf(pinDef.getString("type"));
             createPin(cm,p,pinDef.getInt("x"),pinDef.getInt("y"));
-
+            if(p.pinType!= Pin.PinType.VCC) {
+                LinkedList<PinState> linkedList = new LinkedList<PinState>();
+                for (JsonValue jv:pinDef.get("state")){
+                    PinState ps=new PinState(jv.asInt());
+                    ps.up=jv.name.equalsIgnoreCase("1");
+                    linkedList.add(ps);
+                }
+                p.states=linkedList;
+            }
         });
         cm.load(ois);
         ois.close();
