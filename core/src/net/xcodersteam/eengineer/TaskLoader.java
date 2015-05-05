@@ -9,6 +9,7 @@ import net.xcodersteam.eengineer.components.Pin;
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +17,16 @@ import java.util.Map;
  */
 public class TaskLoader {
     File task;
+
+    private PinStateList loadStates(JsonValue pinDef){
+        PinStateList psL=new PinStateList();
+        for (JsonValue jv:pinDef.get("state")){
+            PinState ps=new PinState(jv.asInt());
+            ps.up=jv.name.equalsIgnoreCase("1");
+            psL.add(ps);
+        }
+        return psL;
+    }
     public TaskLoader(File task){
         this.task=task;
     }
@@ -27,7 +38,7 @@ public class TaskLoader {
         ConstructionManager cm=new ConstructionManager(height,width);
         JsonValue pins=root.get("pins");
         pins.forEach(pinDef -> {
-            int timeThis=0;
+
             Pin p=new Pin(pinDef.name);
             if(pinDef.name.equalsIgnoreCase("VCC"))
                 p.pinType= Pin.PinType.VCC;
@@ -35,16 +46,10 @@ public class TaskLoader {
                 p.pinType= Pin.PinType.valueOf(pinDef.getString("type"));
             createPin(cm,p,pinDef.getInt("x"),pinDef.getInt("y"));
             if(p.pinType!= Pin.PinType.VCC) {
-                LinkedList<PinState> linkedList = new LinkedList<PinState>();
-                for (JsonValue jv:pinDef.get("state")){
-                    PinState ps=new PinState(jv.asInt());
-                    ps.up=jv.name.equalsIgnoreCase("1");
-                    linkedList.add(ps);
-                    timeThis+=ps.len;
-                }
-                p.states=linkedList;
+
+                p.states=loadStates(pinDef);
             }
-            MainGameScreen.instance.simLen=Math.max(MainGameScreen.instance.simLen,timeThis);
+            MainGameScreen.instance.simLen=Math.max(MainGameScreen.instance.simLen,p.states.getLen());
             MainGameScreen.instance.pins.add(p);
         });
 
@@ -81,7 +86,6 @@ public class TaskLoader {
         cm.load(ois);
         ois.close();
         pins.forEach(pinDef -> {
-            int timeThis = 0;
             Pin p = new Pin(pinDef.name);
             if (pinDef.name.equalsIgnoreCase("VCC"))
                 p.pinType = Pin.PinType.VCC;
@@ -92,16 +96,9 @@ public class TaskLoader {
             p.locked=true;
             c.put(p);
             if (p.pinType != Pin.PinType.VCC) {
-                LinkedList<PinState> linkedList = new LinkedList<>();
-                for (JsonValue jv : pinDef.get("state")) {
-                    PinState ps = new PinState(jv.asInt());
-                    ps.up = jv.name.equalsIgnoreCase("1");
-                    linkedList.add(ps);
-                    timeThis += ps.len;
-                }
-                p.states = linkedList;
+                p.states=loadStates(pinDef);
             }
-            MainGameScreen.instance.simLen = Math.max(MainGameScreen.instance.simLen, timeThis);
+            MainGameScreen.instance.simLen = Math.max(MainGameScreen.instance.simLen,p.states.getLen());
             MainGameScreen.instance.pins.add(p);
         });
 

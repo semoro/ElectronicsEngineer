@@ -49,12 +49,12 @@ public class MainGameScreen implements Screen {
     public static int y = 200;
     TaskLoader task;
     public int simLen;
-    int simTime=0;
+    int simTime = 0;
 
-    private void endSimulation(){
-        for(Cell[] i:cm.construction){
-            for(Cell j:i){
-                if(j!=null) {
+    private void endSimulation() {
+        for (Cell[] i : cm.construction) {
+            for (Cell j : i) {
+                if (j != null) {
                     for (GirdComponent c : j.layers) {
                         if (c != null) {
                             c.isPower = false;
@@ -64,10 +64,11 @@ public class MainGameScreen implements Screen {
             }
         }
     }
-    public void simulate(int time){
-        for(Cell[] i:cm.construction){
-            for(Cell j:i){
-                if(j!=null) {
+
+    public void simulate(int time) {
+        for (Cell[] i : cm.construction) {
+            for (Cell j : i) {
+                if (j != null) {
                     for (GirdComponent c : j.layers) {
                         if (c != null) {
                             c.isPower = false;
@@ -76,19 +77,19 @@ public class MainGameScreen implements Screen {
                 }
             }
         }
-        for(int x=0;x<cm.width;x++)
-            for(int y=0;y<cm.height;y++)
-                if(cm.construction[x][y]!=null && cm.construction[x][y].layers[2] instanceof Pin && ((Pin) cm.construction[x][y].layers[2]).getState(time))
-                    cm.construction[x][y].layers[2].powerOn(cm.construction, x,y);
+        for (int x = 0; x < cm.width; x++)
+            for (int y = 0; y < cm.height; y++)
+                if (cm.construction[x][y] != null && cm.construction[x][y].layers[2] instanceof Pin && ((Pin) cm.construction[x][y].layers[2]).getState(time))
+                    cm.construction[x][y].layers[2].powerOn(cm.construction, x, y);
 
-        for(int i=0;i<cm.construction.length;i++){
-            for(int j=0;j<cm.construction[0].length;j++){
-                Cell c=cm.construction[i][j];
-                if(c!=null&&c.layers[1]!=null&&(c.layers[1] instanceof Transistor)){
-                    if(((Transistor)c.layers[1]).type== Transistor.Type.NpN){
-                        ((Transistor)c.layers[1]).isOpened=c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.P);
-                    }else{
-                        ((Transistor)c.layers[1]).isOpened=!c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.N);
+        for (int i = 0; i < cm.construction.length; i++) {
+            for (int j = 0; j < cm.construction[0].length; j++) {
+                Cell c = cm.construction[i][j];
+                if (c != null && c.layers[1] != null && (c.layers[1] instanceof Transistor)) {
+                    if (((Transistor) c.layers[1]).type == Transistor.Type.NpN) {
+                        ((Transistor) c.layers[1]).isOpened = c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.P);
+                    } else {
+                        ((Transistor) c.layers[1]).isOpened = !c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.N);
                     }
                 }
             }
@@ -105,12 +106,13 @@ public class MainGameScreen implements Screen {
         stage.addActor(button);
     }
 
-    public List<Pin> pins=new LinkedList<>();
+    public List<Pin> pins = new LinkedList<>();
 
     JFileChooser fileChooser;
+
     public MainGameScreen() throws IOException, ClassNotFoundException {
         instance = this;
-        fileChooser=new JFileChooser();
+        fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
         fileChooser.addChoosableFileFilter(new FileFilter() {
             @Override
@@ -137,7 +139,7 @@ public class MainGameScreen implements Screen {
         fileChooser.setDialogTitle("Задание");
         fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
         fileChooser.showOpenDialog(null);
-        if(fileChooser.getSelectedFile()==null)
+        if (fileChooser.getSelectedFile() == null)
             Gdx.app.exit();
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
@@ -146,7 +148,7 @@ public class MainGameScreen implements Screen {
         generator.dispose();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
 
-        style.fontColor=Color.BLACK;
+        style.fontColor = Color.BLACK;
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
         File save = fileChooser.getSelectedFile();
@@ -231,27 +233,28 @@ public class MainGameScreen implements Screen {
     private final int cellSize = 20;
 
     float mDelt;
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(235f / 255f, 218f / 255f, 159f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        mDelt+=delta;
-        if(mDelt>=0.05f && simRunning) {
+        mDelt += delta;
+        if (mDelt >= 0.05f && simRunning) {
             simulate(simTime++);
-            pins.stream().filter(p -> p.pinType== Pin.PinType.OUT).forEach(p -> {
-                if (p.testPinsState.size()>0 && p.isPower == p.testPinsState.get(p.testPinsState.size() - 1).up) {
+            pins.stream().filter(p -> p.pinType == Pin.PinType.OUT).forEach(p -> {
+                if (p.testPinsState.size() > 0 && p.isPower == p.testPinsState.get(p.testPinsState.size() - 1).up) {
                     p.testPinsState.get(p.testPinsState.size() - 1).len++;
                 } else {
-                    p.testPinsState.add(new PinState(p.isPower,1));
+                    p.testPinsState.add(new PinState(p.isPower, 1));
 
                 }
             });
-            if(simTime>=simLen){
-                simRunning=false;
+            if (simTime >= simLen) {
+                simRunning = false;
                 endSimulation();
                 System.out.println("Sim end");
             }
-            mDelt=0;
+            mDelt = 0;
         }
 
         renderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -266,6 +269,24 @@ public class MainGameScreen implements Screen {
         stage.act(delta);
         stage.draw();
     }
+
+
+    public void renderImpulse(PinStateList states, float coef, int time) {
+        int ttime = 0;
+        for (PinState ps : states) {
+            renderer.line(0, 0, 0, ps.up ? 10 : 0);
+            renderer.line(0, ps.up ? 10 : 0, Math.min(ps.len * coef, (time - ttime) * coef), ps.up ? 10 : 0);
+            ttime += ps.len;
+            renderer.translate(ps.len * coef, 0, 0);
+            if (ttime >= time)
+                break;
+            renderer.line(0, ps.up ? 10 : 0, 0, 0);
+        }
+        if (ttime < time)
+            renderer.line(0, 0, (time - ttime) * coef, 0);
+        renderer.translate(-ttime * coef, 0, 0);
+    }
+
 
     public void renderGui() {
         int val = 1;
@@ -294,79 +315,24 @@ public class MainGameScreen implements Screen {
         renderer.setColor(Color.BLACK);
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.translate(30, 130, 0);
-        float coef= (Gdx.graphics.getWidth() - 60f)/(float)simLen;
-        //System.out.println(coef);//if(simRunning) {
-            for (Pin p : pins) {
-                if (p.pinType != Pin.PinType.VCC) {
-                    if (p.pinType == Pin.PinType.IN) {
-                        {
-                            renderer.setColor(Color.RED);
-                            int ttime = 0;
-                            for (PinState ps : p.states) {
-                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
-                                renderer.line(0, ps.up ? 10 : 0, ps.len*coef, ps.up?10:0);
-                                ttime += ps.len;
-                                renderer.translate(ps.len*coef,0,0);
-                                renderer.line(0, ps.up?10:0,0,0);
-                            }
-                            if(ttime<simLen)
-                                renderer.line(0, 0,  (simLen-ttime)*coef,0);
-                            renderer.translate(-ttime*coef,0,0);
-                        }
-                        {
-                            renderer.setColor(Color.BLACK);
-                            int ttime = 0;
-                            for (PinState ps : p.states) {
-                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
-                                renderer.line(0, ps.up ? 10 : 0, Math.min(ps.len * coef, (simTime - ttime) * coef), ps.up ? 10 : 0);
-                                ttime += ps.len;
-                                renderer.translate(ps.len * coef, 0, 0);
-                                if (ttime > simTime)
-                                    break;
-                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
-                            }
-                            if (ttime < simTime)
-                                renderer.line(0, 0, (simTime - ttime) * coef, 0);
-                            renderer.translate(-ttime * coef, 0, 0);
-                        }
-
-                    }else if(p.pinType == Pin.PinType.OUT){
-                        {
-                            renderer.setColor(Color.RED);
-                            int ttime = 0;
-                            for (PinState ps : p.states) {
-                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
-                                renderer.line(0, ps.up ? 10 : 0, ps.len * coef, ps.up ? 10 : 0);
-                                ttime += ps.len;
-                                renderer.translate(ps.len * coef, 0, 0);
-                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
-                            }
-                            if (ttime < simLen)
-                                renderer.line(0, 0, (simLen - ttime) * coef, 0);
-                            renderer.translate(-ttime * coef, 0, 0);
-                        }
-                        {
-                            renderer.setColor(Color.BLACK);
-                            int ttime = 0;
-                            for (PinState ps : p.testPinsState) {
-                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
-                                renderer.line(0, ps.up ? 10 : 0, Math.min(ps.len * coef, (simTime - ttime) * coef), ps.up ? 10 : 0);
-                                ttime += ps.len;
-                                renderer.translate(ps.len * coef, 0, 0);
-                                if (ttime >= simTime)
-                                    break;
-                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
-                            }
-                            if (ttime < simTime)
-                                renderer.line(0, 0, (simTime - ttime) * coef, 0);
-                            renderer.translate(-ttime * coef, 0, 0);
-                        }
-                    }
-                    renderer.translate(0,-20,0);
+        float coef = (Gdx.graphics.getWidth() - 60f) / (float) simLen;
+        for (Pin p : pins) {
+            if (p.pinType != Pin.PinType.VCC) {
+                if (p.pinType == Pin.PinType.IN) {
+                    renderer.setColor(Color.valueOf("26733A"));
+                    renderImpulse(p.states, coef, simLen);
+                    renderer.setColor(Color.BLACK);
+                    renderImpulse(p.states, coef, simTime);
+                } else if (p.pinType == Pin.PinType.OUT) {
+                    renderer.setColor(Color.valueOf("7F2F33"));
+                    renderImpulse(p.states, coef, simLen);
+                    renderer.setColor(Color.BLACK);
+                    renderImpulse(p.testPinsState, coef, simTime);
                 }
+                renderer.translate(0, -20, 0);
             }
-       // }
-        renderer.getTransformMatrix().setTranslation(0,0,0);
+        }
+        renderer.getTransformMatrix().setTranslation(0, 0, 0);
     }
 
     public void renderSecondPass(int sx, int sy) {
@@ -378,7 +344,7 @@ public class MainGameScreen implements Screen {
                     for (GirdComponent component : cm.construction[x][y].layers) {
                         if (component == null)
                             continue;
-                        component.renderSecondPass(stageBatch, cm.construction[x][y],x*(cellSize+1)+sx,y*(cellSize+1)+sy, cellSize, cellSize);
+                        component.renderSecondPass(stageBatch, cm.construction[x][y], x * (cellSize + 1) + sx, y * (cellSize + 1) + sy, cellSize, cellSize);
                         stageBatch.flush();
                     }
                 }
@@ -387,11 +353,11 @@ public class MainGameScreen implements Screen {
 
         }
 
-        int posY=140;
+        int posY = 140;
         for (Pin p : pins) {
             if (p.pinType != Pin.PinType.VCC) {
-                font.draw(stageBatch,p.name,2,posY);
-                posY-=20;
+                font.draw(stageBatch, p.name, 2, posY);
+                posY -= 20;
             }
         }
 
@@ -407,13 +373,13 @@ public class MainGameScreen implements Screen {
                 renderer.setColor(Color.valueOf("CCCCCC"));
                 renderer.rect(0, 0, cellSize, cellSize);
                 if (cm.construction[x][y] != null) {
-                    boolean d=false;
+                    boolean d = false;
                     for (GirdComponent component : cm.construction[x][y].layers) {
                         if (component == null)
                             continue;
                         component.render(renderer, cm.construction[x][y], cellSize, cellSize);
-                        if(component.isPower)
-                            d=true;
+                        if (component.isPower)
+                            d = true;
                     }
                     if (cm.construction[x][y].via) {
                         renderer.setColor(Color.BLACK);
@@ -421,11 +387,11 @@ public class MainGameScreen implements Screen {
                         renderer.circle(cellSize / 2, cellSize / 2, 7f);
                         renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
-                    if(d){
+                    if (d) {
                         renderer.setColor(Color.BLACK);
                         renderer.set(ShapeRenderer.ShapeType.Line);
                         renderer.line(0, 0, cellSize, cellSize);
-                        renderer.line(0,cellSize,cellSize,0);
+                        renderer.line(0, cellSize, cellSize, 0);
                         renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
                 }
@@ -463,7 +429,7 @@ public class MainGameScreen implements Screen {
 
     }
 
-    boolean simRunning=false;
+    boolean simRunning = false;
 
 
     class MainInputProcessor implements InputProcessor {
@@ -474,24 +440,26 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean keyUp(int keycode) {
-            switch (keycode){
+            switch (keycode) {
                 case Input.Keys.Q:
                     buttonP.setChecked(true);
                     break;
-                case Input.Keys.W :
+                case Input.Keys.W:
                     buttonC.setChecked(true);
                     break;
-                case Input.Keys.E :
+                case Input.Keys.E:
                     buttonM.setChecked(true);
                     break;
-                case Input.Keys.R :
+                case Input.Keys.R:
                     viabutton.setChecked(true);
                     break;
                 case Input.Keys.SPACE: {
                     cm.cleanUp();
-                    pins.forEach(p->{p.testPinsState.clear();});
-                    simRunning=true;
-                    simTime=0;
+                    pins.forEach(p -> {
+                        p.testPinsState.clear();
+                    });
+                    simRunning = !simRunning;
+                    simTime = 0;
                     break;
                 }
             }
@@ -537,7 +505,7 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-            if(simRunning)
+            if (simRunning)
                 return true;
             try {
                 click = b;
@@ -573,7 +541,7 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
-            if(simRunning)
+            if (simRunning)
                 return true;
             int deltaX = getCellX(screenX) - lastCellX;
             int deltaY = getCellY(screenY) - lastCellY;
@@ -612,7 +580,7 @@ public class MainGameScreen implements Screen {
                         Cell cell = getCellAt(screenX, screenY);
                         int cellX = getCellX(screenX);
                         int cellY = getCellY(screenY);
-                        if(tool.delete(cell)) {
+                        if (tool.delete(cell)) {
                             deleteConnection(cellX, cellY, tool);
                             cm.cleanUp(cellX, cellY);
                         }

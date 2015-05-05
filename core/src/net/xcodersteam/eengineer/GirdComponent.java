@@ -73,18 +73,26 @@ public abstract class GirdComponent implements Serializable{
     		return;
     	}
     	isPower=true;
-    	if((connection&0b1)>0&&cells[x][y+1]!=null){
-    		cells[x][y+1].layers[getLayer()].powerOn(cells, x, y+1);
-		}
-		if((connection&0b10)>0&&cells[x+1][y]!=null){
-			cells[x+1][y].layers[getLayer()].powerOn(cells, x+1, y);
-		}
-		if((connection&0b100)>0&&cells[x][y-1]!=null){
-			cells[x][y-1].layers[getLayer()].powerOn(cells, x, y-1);
-		}
-		if((connection&0b1000)>0&&cells[x-1][y]!=null){
-			cells[x-1][y].layers[getLayer()].powerOn(cells, x-1, y);
-		}
+        try {
+            if ((connection & 0b1) > 0 && cells[x][y + 1] != null) {
+                cells[x][y + 1].layers[getLayer()].powerOn(cells, x, y + 1);
+            }
+            if ((connection & 0b10) > 0 && cells[x + 1][y] != null) {
+                cells[x + 1][y].layers[getLayer()].powerOn(cells, x + 1, y);
+            }
+            if ((connection & 0b100) > 0 && cells[x][y - 1] != null) {
+                cells[x][y - 1].layers[getLayer()].powerOn(cells, x, y - 1);
+            }
+            if ((connection & 0b1000) > 0 && cells[x - 1][y] != null) {
+                cells[x - 1][y].layers[getLayer()].powerOn(cells, x - 1, y);
+            }
+        }catch(Exception e){
+            if(e instanceof NullPointerException){
+                e.printStackTrace();
+                System.out.println(Integer.toBinaryString(connection));
+
+            }
+        }
     }
     
     public boolean getIsSiliconPowerOn(Cell[][] cells, int x, int y,Silicon.Type type){
@@ -129,7 +137,7 @@ public abstract class GirdComponent implements Serializable{
 		}
 		if((connection&0b1000)>0&&cells[x-1][y]!=null){
 			if(((Silicon)cells[x-1][y].layers[getLayer()]).type==type){
-				cells[x-1][y].layers[getLayer()].powerOn(cells, x+1, y);
+				cells[x-1][y].layers[getLayer()].powerOn(cells, x-1, y);
 			}
 		}
     }

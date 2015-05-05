@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import net.xcodersteam.eengineer.Cell;
-import net.xcodersteam.eengineer.GirdComponent;
-import net.xcodersteam.eengineer.MainGameScreen;
-import net.xcodersteam.eengineer.PinState;
+import net.xcodersteam.eengineer.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,11 +18,11 @@ public class Pin extends GirdComponent {
     public Pin(String name){ this.name=name;  }
 	public Pin(){
         locked=true;
-        states=new LinkedList<>();
-        testPinsState=new LinkedList<>();
+        states=new PinStateList();
+        testPinsState= new PinStateList();
     }
 	public enum PinType{
-		IN,OUT,VCC;
+		IN,OUT,VCC
 	}
 	
 	@Override
@@ -33,21 +30,15 @@ public class Pin extends GirdComponent {
 		return Color.DARK_GRAY;
 	}
 
-    public transient List<PinState> states=new LinkedList<>();
-    public transient List<PinState> testPinsState=new LinkedList<>();
+    public transient PinStateList states=new PinStateList();
+    public transient PinStateList testPinsState=new PinStateList();
     public boolean getState(int time){
         if(pinType==PinType.VCC) {
             return true;
         }else if(pinType==PinType.OUT) {
             return false;
         }else if(pinType==PinType.IN){
-            int ok = 0;
-            for (PinState state : states) {
-                ok += state.len;
-                if (ok > time)
-                    return state.up;
-            }
-            return false;
+            return states.getState(time);
         }
         return false;
     }
