@@ -24,7 +24,7 @@ public class TaskLoader {
         JsonValue root= jr.parse(new FileInputStream(task));
         int width=root.getInt("w");
         int height=root.getInt("h");
-        ConstructionManager cm=new ConstructionManager(width,height);
+        ConstructionManager cm=new ConstructionManager(height,width);
         JsonValue pins=root.get("pins");
         pins.forEach(pinDef -> {
             int timeThis=0;
@@ -76,7 +76,7 @@ public class TaskLoader {
         JsonValue root= jr.parse(new FileInputStream(task));
         int width=root.getInt("w");
         int height=root.getInt("h");
-        ConstructionManager cm=new ConstructionManager(width,height);
+        ConstructionManager cm=new ConstructionManager(height,width);
         JsonValue pins=root.get("pins");
         cm.load(ois);
         ois.close();
