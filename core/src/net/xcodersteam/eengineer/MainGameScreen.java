@@ -278,9 +278,9 @@ public class MainGameScreen implements Screen {
         renderer.rectLine(Gdx.graphics.getWidth() - 30, Gdx.graphics.getHeight() - 5, Gdx.graphics.getWidth() - 5, Gdx.graphics.getHeight() - 30, 2f);
         renderer.setColor(Color.BLACK);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3 - 1, Gdx.graphics.getHeight() - 35 - val + 1, cellSize * 3 + 1, -cellSize * 12 - 5);
-        renderer.setColor(Color.RED);
-        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
         renderer.setColor(Color.YELLOW);
+        renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
+        renderer.setColor(Color.RED);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
         renderer.setColor(Color.DARK_GRAY);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
