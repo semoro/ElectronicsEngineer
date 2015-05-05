@@ -20,6 +20,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by fantasyday on 21.04.2015.
@@ -46,10 +48,10 @@ public class MainGameScreen implements Screen {
     public static int x = 100;
     public static int y = 200;
     TaskLoader task;
+    public int simLen;
+    int simTime=0;
 
-
-    public void simulate(int time){
-
+    private void endSimulation(){
         for(Cell[] i:cm.construction){
             for(Cell j:i){
                 if(j!=null) {
@@ -59,15 +61,25 @@ public class MainGameScreen implements Screen {
                         }
                     }
                 }
-
             }
-
+        }
+    }
+    public void simulate(int time){
+        for(Cell[] i:cm.construction){
+            for(Cell j:i){
+                if(j!=null) {
+                    for (GirdComponent c : j.layers) {
+                        if (c != null) {
+                            c.isPower = false;
+                        }
+                    }
+                }
+            }
         }
         for(int x=0;x<cm.width;x++)
             for(int y=0;y<cm.height;y++)
                 if(cm.construction[x][y]!=null && cm.construction[x][y].layers[2] instanceof Pin && ((Pin) cm.construction[x][y].layers[2]).getState(time))
                     cm.construction[x][y].layers[2].powerOn(cm.construction, x,y);
-
 
         for(int i=0;i<cm.construction.length;i++){
             for(int j=0;j<cm.construction[0].length;j++){
@@ -93,8 +105,11 @@ public class MainGameScreen implements Screen {
         stage.addActor(button);
     }
 
+    public List<Pin> pins=new LinkedList<>();
+
     JFileChooser fileChooser;
     public MainGameScreen() throws IOException, ClassNotFoundException {
+        instance = this;
         fileChooser=new JFileChooser();
         fileChooser.setCurrentDirectory(new File("."));
         fileChooser.addChoosableFileFilter(new FileFilter() {
@@ -130,6 +145,8 @@ public class MainGameScreen implements Screen {
         font = generator.generateFont(parameter);
         generator.dispose();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+
+        style.fontColor=Color.BLACK;
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
         File save = fileChooser.getSelectedFile();
@@ -150,6 +167,7 @@ public class MainGameScreen implements Screen {
         setButton(buttonP, 3);
         buttonC = new TextButton(new String(), style);
         buttonC.setText("Silicon N");
+
         buttonC.setUserObject(new NSiliconTool());
         setButton(buttonC, 6);
         buttonM = new TextButton(new String(), style);
@@ -157,7 +175,7 @@ public class MainGameScreen implements Screen {
         buttonM.setUserObject(new MetalTool());
         setButton(buttonM, 9);
         viabutton = new TextButton(new String(), style);
-        viabutton.setText("Add via");
+        viabutton.setText("Via");
         viabutton.setUserObject(new ViaTool());
         setButton(viabutton, 12);
         close = new TextButton(new String(), style);
@@ -168,17 +186,17 @@ public class MainGameScreen implements Screen {
         close.setY(Gdx.graphics.getHeight() - 35);
         stage.addActor(close);
         group.uncheckAll();
-        buttonP.addListener(new ButtonChangeListener(buttonP, "Silicon P", "P - type"));
-        buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "N - type"));
-        buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "Set metal"));
-        viabutton.addListener(new ButtonChangeListener(viabutton, "Add via", "Via"));
+        buttonP.addListener(new ButtonChangeListener(buttonP, "Silicon P", "[P-type]"));
+        buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "[N-type]"));
+        buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "[Metal]"));
+        viabutton.addListener(new ButtonChangeListener(viabutton, "Via", "[Via]"));
 
         close.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
                 if (event.toString().equals("touchDown")) {
                     try {
-                        JFileChooser fileChooser1=new JFileChooser();
+                        JFileChooser fileChooser1 = new JFileChooser();
                         fileChooser1.removeChoosableFileFilter(fileChooser1.getAcceptAllFileFilter());
                         fileChooser1.addChoosableFileFilter(new FileFilter() {
                             @Override
@@ -196,8 +214,8 @@ public class MainGameScreen implements Screen {
 
                         fileChooser1.showSaveDialog(null);
 
-                        if(fileChooser1.getSelectedFile()!=null)
-                        task.save(fileChooser1.getSelectedFile(),cm);
+                        if (fileChooser1.getSelectedFile() != null)
+                            task.save(fileChooser1.getSelectedFile(), cm);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -207,16 +225,34 @@ public class MainGameScreen implements Screen {
             }
         });
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, new MainInputProcessor()));
-        instance = this;
+
     }
 
     private final int cellSize = 20;
 
+    float mDelt;
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(235f / 255f, 218f / 255f, 159f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        mDelt+=delta;
+        if(mDelt>=0.05f && simRunning) {
+            simulate(simTime++);
+            pins.stream().filter(p -> p.pinType== Pin.PinType.OUT).forEach(p -> {
+                if (p.testPinsState.size()>0 && p.isPower == p.testPinsState.get(p.testPinsState.size() - 1).up) {
+                    p.testPinsState.get(p.testPinsState.size() - 1).len++;
+                } else {
+                    p.testPinsState.add(new PinState(p.isPower,1));
 
+                }
+            });
+            if(simTime>=simLen){
+                simRunning=false;
+                endSimulation();
+                System.out.println("Sim end");
+            }
+            mDelt=0;
+        }
 
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setAutoShapeType(true);
@@ -224,7 +260,7 @@ public class MainGameScreen implements Screen {
         renderGui();
         renderer.end();
         stageBatch.begin();
-        renderSecondPass(x,y);
+        renderSecondPass(x, y);
 
         stageBatch.end();
         stage.act(delta);
@@ -248,8 +284,89 @@ public class MainGameScreen implements Screen {
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
         renderer.setColor(Color.DARK_GRAY);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
-        renderer.setColor(Color.NAVY);
+        renderer.setColor(Color.BLUE);
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
+
+        renderer.setColor(Color.valueOf("CD853F"));
+        renderer.rect(0, 0, Gdx.graphics.getWidth(), 150);
+        renderer.setColor(Color.valueOf("D2B48C"));
+        renderer.rect(20, 5, Gdx.graphics.getWidth() - 40, 140);
+        renderer.setColor(Color.BLACK);
+        renderer.set(ShapeRenderer.ShapeType.Line);
+        renderer.translate(30, 130, 0);
+        float coef= (Gdx.graphics.getWidth() - 60f)/(float)simLen;
+        //System.out.println(coef);//if(simRunning) {
+            for (Pin p : pins) {
+                if (p.pinType != Pin.PinType.VCC) {
+                    if (p.pinType == Pin.PinType.IN) {
+                        {
+                            renderer.setColor(Color.RED);
+                            int ttime = 0;
+                            for (PinState ps : p.states) {
+                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
+                                renderer.line(0, ps.up ? 10 : 0, ps.len*coef, ps.up?10:0);
+                                ttime += ps.len;
+                                renderer.translate(ps.len*coef,0,0);
+                                renderer.line(0, ps.up?10:0,0,0);
+                            }
+                            if(ttime<simLen)
+                                renderer.line(0, 0,  (simLen-ttime)*coef,0);
+                            renderer.translate(-ttime*coef,0,0);
+                        }
+                        {
+                            renderer.setColor(Color.BLACK);
+                            int ttime = 0;
+                            for (PinState ps : p.states) {
+                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
+                                renderer.line(0, ps.up ? 10 : 0, Math.min(ps.len * coef, (simTime - ttime) * coef), ps.up ? 10 : 0);
+                                ttime += ps.len;
+                                renderer.translate(ps.len * coef, 0, 0);
+                                if (ttime > simTime)
+                                    break;
+                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
+                            }
+                            if (ttime < simTime)
+                                renderer.line(0, 0, (simTime - ttime) * coef, 0);
+                            renderer.translate(-ttime * coef, 0, 0);
+                        }
+
+                    }else if(p.pinType == Pin.PinType.OUT){
+                        {
+                            renderer.setColor(Color.RED);
+                            int ttime = 0;
+                            for (PinState ps : p.states) {
+                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
+                                renderer.line(0, ps.up ? 10 : 0, ps.len * coef, ps.up ? 10 : 0);
+                                ttime += ps.len;
+                                renderer.translate(ps.len * coef, 0, 0);
+                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
+                            }
+                            if (ttime < simLen)
+                                renderer.line(0, 0, (simLen - ttime) * coef, 0);
+                            renderer.translate(-ttime * coef, 0, 0);
+                        }
+                        {
+                            renderer.setColor(Color.BLACK);
+                            int ttime = 0;
+                            for (PinState ps : p.testPinsState) {
+                                renderer.line(0, 0, 0, ps.up ? 10 : 0);
+                                renderer.line(0, ps.up ? 10 : 0, Math.min(ps.len * coef, (simTime - ttime) * coef), ps.up ? 10 : 0);
+                                ttime += ps.len;
+                                renderer.translate(ps.len * coef, 0, 0);
+                                if (ttime >= simTime)
+                                    break;
+                                renderer.line(0, ps.up ? 10 : 0, 0, 0);
+                            }
+                            if (ttime < simTime)
+                                renderer.line(0, 0, (simTime - ttime) * coef, 0);
+                            renderer.translate(-ttime * coef, 0, 0);
+                        }
+                    }
+                    renderer.translate(0,-20,0);
+                }
+            }
+       // }
+        renderer.getTransformMatrix().setTranslation(0,0,0);
     }
 
     public void renderSecondPass(int sx, int sy) {
@@ -262,12 +379,22 @@ public class MainGameScreen implements Screen {
                         if (component == null)
                             continue;
                         component.renderSecondPass(stageBatch, cm.construction[x][y],x*(cellSize+1)+sx,y*(cellSize+1)+sy, cellSize, cellSize);
+                        stageBatch.flush();
                     }
                 }
 
             }
 
         }
+
+        int posY=140;
+        for (Pin p : pins) {
+            if (p.pinType != Pin.PinType.VCC) {
+                font.draw(stageBatch,p.name,2,posY);
+                posY-=20;
+            }
+        }
+
 
     }
 
@@ -336,6 +463,8 @@ public class MainGameScreen implements Screen {
 
     }
 
+    boolean simRunning=false;
+
 
     class MainInputProcessor implements InputProcessor {
         @Override
@@ -345,7 +474,27 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean keyUp(int keycode) {
-            simulate(0);
+            switch (keycode){
+                case Input.Keys.Q:
+                    buttonP.setChecked(true);
+                    break;
+                case Input.Keys.W :
+                    buttonC.setChecked(true);
+                    break;
+                case Input.Keys.E :
+                    buttonM.setChecked(true);
+                    break;
+                case Input.Keys.R :
+                    viabutton.setChecked(true);
+                    break;
+                case Input.Keys.SPACE: {
+                    cm.cleanUp();
+                    pins.forEach(p->{p.testPinsState.clear();});
+                    simRunning=true;
+                    simTime=0;
+                    break;
+                }
+            }
             return true;
         }
 
@@ -355,7 +504,7 @@ public class MainGameScreen implements Screen {
         }
 
         public Cell getCellAt(int screenX, int screenY) {
-            return cm.getCell((screenX - x) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - x) / (cellSize + 1));
+            return cm.getCell((screenX - x) / (cellSize + 1), (Gdx.graphics.getHeight() - screenY - y) / (cellSize + 1));
         }
 
         public int getCellX(int screenX) {
@@ -388,6 +537,8 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int b) {
+            if(simRunning)
+                return true;
             try {
                 click = b;
                 Cell c = cm.getCell(getCellX(screenX), getCellY(screenY));
@@ -422,6 +573,8 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
+            if(simRunning)
+                return true;
             int deltaX = getCellX(screenX) - lastCellX;
             int deltaY = getCellY(screenY) - lastCellY;
             if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {

@@ -11,4 +11,9 @@ public class PinState {
 
         this.len = len;
     }
+
+    public PinState(boolean up, int len) {
+        this.up = up;
+        this.len = len;
+    }
 }

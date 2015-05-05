@@ -17,10 +17,12 @@ import java.util.List;
 
 public class Pin extends GirdComponent {
 	public PinType pinType;
-	String name;
+	public String name;
     public Pin(String name){ this.name=name;  }
 	public Pin(){
         locked=true;
+        states=new LinkedList<>();
+        testPinsState=new LinkedList<>();
     }
 	public enum PinType{
 		IN,OUT,VCC;
@@ -31,8 +33,8 @@ public class Pin extends GirdComponent {
 		return Color.DARK_GRAY;
 	}
 
-    public List<PinState> states=new LinkedList<>();
-
+    public transient List<PinState> states=new LinkedList<>();
+    public transient List<PinState> testPinsState=new LinkedList<>();
     public boolean getState(int time){
         if(pinType==PinType.VCC) {
             return true;
