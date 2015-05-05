@@ -11,7 +11,7 @@ import net.xcodersteam.eengineer.GirdComponent;
 public class Silicon extends GirdComponent{
     public Type type;
     public enum Type{
-        N(Color.YELLOW),P(Color.RED);
+        N(Color.RED),P(Color.YELLOW);
         public Color color;
         private Type(Color c){
             color = c;
