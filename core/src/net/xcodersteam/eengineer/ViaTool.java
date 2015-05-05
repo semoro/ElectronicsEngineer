@@ -6,7 +6,7 @@ package net.xcodersteam.eengineer;
 public class ViaTool extends LineTool {
     @Override
     public boolean perform(Cell cell) {
-        if(cell.layers[1] != null || cell.layers[2] != null)
+        if(cell.layers[1] != null && cell.layers[2] != null)
             cell.via = true;
         return true;
     }
