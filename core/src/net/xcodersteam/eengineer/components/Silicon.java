@@ -13,7 +13,7 @@ public class Silicon extends GirdComponent{
     public enum Type{
         N(Color.RED),P(Color.YELLOW);
         public Color color;
-        private Type(Color c){
+        Type(Color c){
             color = c;
         }
     }

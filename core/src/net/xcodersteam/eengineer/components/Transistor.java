@@ -12,7 +12,7 @@ public class Transistor extends GirdComponent {
 	public enum Type{
 		PnP(Color.YELLOW.cpy().mul(0.3f).add(Color.RED.cpy().mul(0.5f))),NpN(Color.RED.cpy().mul(0.3f).add(Color.YELLOW.cpy().mul(0.5f)));
 		public Color color;
-        private Type(Color c){
+        Type(Color c){
             color = c;
         }
 	}

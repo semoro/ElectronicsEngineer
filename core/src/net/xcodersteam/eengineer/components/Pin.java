@@ -47,14 +47,12 @@ public class Pin extends GirdComponent {
 	public int getLayer() {
 		return 2;
 	}
-    transient GlyphLayout g;
     @Override
     public void renderSecondPass(Batch b, Cell c, int x, int y, int w, int h) {
         super.renderSecondPass(b, c, x, y, w, h);
 
-        if(g==null)
-            g=MainGameScreen.font.draw(b, name, x+5, y);
-        else
-            MainGameScreen.font.draw(b, name, x+5, y+g.height/2+h/2);
+
+            MainGameScreen.font.draw(b, name, x+5, y+h);
+
     }
 }
