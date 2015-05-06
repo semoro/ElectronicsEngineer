@@ -11,7 +11,6 @@ public class DesktopLauncher {
         config.height = 600;
         config.width = 600;
         config.resizable = false;
-        config.x=1400;
 		new LwjglApplication(new EEngineerGame(), config);
 
 	}

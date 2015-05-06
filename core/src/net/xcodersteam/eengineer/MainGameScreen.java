@@ -50,6 +50,7 @@ public class MainGameScreen implements Screen {
     TaskLoader task;
     public int simLen;
     int simTime = 0;
+    public float res = 0;
 
     private void endSimulation() {
         for (Cell[] i : cm.construction) {
@@ -242,12 +243,10 @@ public class MainGameScreen implements Screen {
         if (mDelt >= 0.05f && simRunning) {
             simulate(simTime++);
             pins.stream().filter(p -> p.pinType == Pin.PinType.OUT).forEach(p -> {
-                if (p.testPinsState.size() > 0 && p.isPower == p.testPinsState.get(p.testPinsState.size() - 1).up) {
-                    p.testPinsState.get(p.testPinsState.size() - 1).len++;
-                } else {
-                    p.testPinsState.add(new PinState(p.isPower, 1));
+                if (p.isPower == p.states.getState(simTime))
+                    res++;
 
-                }
+                p.testPinsState.add(new PinState(p.isPower, 1));
             });
             if (simTime >= simLen) {
                 simRunning = false;
@@ -360,6 +359,8 @@ public class MainGameScreen implements Screen {
                 posY -= 20;
             }
         }
+        if(simTime != 0)
+            font.draw(stageBatch, "" + (res / simTime)/(pins.stream().filter(p->p.pinType==Pin.PinType.OUT).count()) * 100f, 10, 15);
 
 
     }
@@ -454,6 +455,7 @@ public class MainGameScreen implements Screen {
                     viabutton.setChecked(true);
                     break;
                 case Input.Keys.SPACE: {
+                    res = 0;
                     cm.cleanUp();
                     pins.forEach(p -> {
                         p.testPinsState.clear();

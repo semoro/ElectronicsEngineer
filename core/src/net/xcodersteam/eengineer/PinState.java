@@ -8,7 +8,6 @@ public class PinState {
     public int len;
 
     public PinState( int len) {
-
         this.len = len;
     }
 
