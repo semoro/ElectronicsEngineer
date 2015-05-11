@@ -89,8 +89,6 @@ public abstract class GirdComponent implements Serializable{
         }catch(Exception e){
             if(e instanceof NullPointerException){
                 e.printStackTrace();
-                System.out.println(Integer.toBinaryString(connection));
-
             }
         }
     }

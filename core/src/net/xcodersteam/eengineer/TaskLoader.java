@@ -49,7 +49,6 @@ public class TaskLoader {
 
                 p.states=loadStates(pinDef);
             }
-            MainGameScreen.instance.simLen=Math.max(MainGameScreen.instance.simLen,p.states.getLen());
             MainGameScreen.instance.pins.add(p);
         });
 
@@ -98,7 +97,7 @@ public class TaskLoader {
             if (p.pinType != Pin.PinType.VCC) {
                 p.states=loadStates(pinDef);
             }
-            MainGameScreen.instance.simLen = Math.max(MainGameScreen.instance.simLen,p.states.getLen());
+
             MainGameScreen.instance.pins.add(p);
         });
 

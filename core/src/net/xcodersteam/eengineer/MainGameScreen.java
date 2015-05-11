@@ -48,55 +48,6 @@ public class MainGameScreen implements Screen {
     public static int x = 100;
     public static int y = 200;
     TaskLoader task;
-    public int simLen;
-    int simTime = 0;
-    public float res = 0;
-
-    private void endSimulation() {
-        for (Cell[] i : cm.construction) {
-            for (Cell j : i) {
-                if (j != null) {
-                    for (GirdComponent c : j.layers) {
-                        if (c != null) {
-                            c.isPower = false;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void simulate(int time) {
-        for (Cell[] i : cm.construction) {
-            for (Cell j : i) {
-                if (j != null) {
-                    for (GirdComponent c : j.layers) {
-                        if (c != null) {
-                            c.isPower = false;
-                        }
-                    }
-                }
-            }
-        }
-        for (int x = 0; x < cm.width; x++)
-            for (int y = 0; y < cm.height; y++)
-                if (cm.construction[x][y] != null && cm.construction[x][y].layers[2] instanceof Pin && ((Pin) cm.construction[x][y].layers[2]).getState(time))
-                    cm.construction[x][y].layers[2].powerOn(cm.construction, x, y);
-
-        for (int i = 0; i < cm.construction.length; i++) {
-            for (int j = 0; j < cm.construction[0].length; j++) {
-                Cell c = cm.construction[i][j];
-                if (c != null && c.layers[1] != null && (c.layers[1] instanceof Transistor)) {
-                    if (((Transistor) c.layers[1]).type == Transistor.Type.NpN) {
-                        ((Transistor) c.layers[1]).isOpened = c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.P);
-                    } else {
-                        ((Transistor) c.layers[1]).isOpened = !c.layers[1].getIsSiliconPowerOn(cm.construction, i, j, Silicon.Type.N);
-                    }
-                }
-            }
-        }
-    }
-
 
     public void setButton(TextButton button, float x) {
         group.add(button);
@@ -110,6 +61,7 @@ public class MainGameScreen implements Screen {
     public List<Pin> pins = new LinkedList<>();
 
     JFileChooser fileChooser;
+    Simulation sim;
 
     public MainGameScreen() throws IOException, ClassNotFoundException {
         instance = this;
@@ -228,7 +180,7 @@ public class MainGameScreen implements Screen {
             }
         });
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, new MainInputProcessor()));
-
+        sim=new Simulation(this);
     }
 
     private final int cellSize = 20;
@@ -240,19 +192,8 @@ public class MainGameScreen implements Screen {
         Gdx.gl.glClearColor(235f / 255f, 218f / 255f, 159f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mDelt += delta;
-        if (mDelt >= 0.05f && simRunning) {
-            simulate(simTime++);
-            pins.stream().filter(p -> p.pinType == Pin.PinType.OUT).forEach(p -> {
-                if (p.isPower == p.states.getState(simTime))
-                    res++;
-
-                p.testPinsState.add(new PinState(p.isPower, 1));
-            });
-            if (simTime >= simLen) {
-                simRunning = false;
-                endSimulation();
-                System.out.println("Sim end");
-            }
+        if (mDelt >= 0.05f && sim.isRunning()) {
+            sim.simulate();
             mDelt = 0;
         }
 
@@ -314,19 +255,19 @@ public class MainGameScreen implements Screen {
         renderer.setColor(Color.BLACK);
         renderer.set(ShapeRenderer.ShapeType.Line);
         renderer.translate(30, 130, 0);
-        float coef = (Gdx.graphics.getWidth() - 60f) / (float) simLen;
+        float coef = (Gdx.graphics.getWidth() - 60f) / (float) sim.length;
         for (Pin p : pins) {
             if (p.pinType != Pin.PinType.VCC) {
                 if (p.pinType == Pin.PinType.IN) {
                     renderer.setColor(Color.valueOf("26733A"));
-                    renderImpulse(p.states, coef, simLen);
+                    renderImpulse(p.states, coef, sim.length);
                     renderer.setColor(Color.BLACK);
-                    renderImpulse(p.states, coef, simTime);
+                    renderImpulse(p.states, coef, sim.time);
                 } else if (p.pinType == Pin.PinType.OUT) {
                     renderer.setColor(Color.valueOf("7F2F33"));
-                    renderImpulse(p.states, coef, simLen);
+                    renderImpulse(p.states, coef, sim.length);
                     renderer.setColor(Color.BLACK);
-                    renderImpulse(p.testPinsState, coef, simTime);
+                    renderImpulse(p.testPinsState, coef, sim.time);
                 }
                 renderer.translate(0, -20, 0);
             }
@@ -359,10 +300,8 @@ public class MainGameScreen implements Screen {
                 posY -= 20;
             }
         }
-        if(simTime != 0)
-            font.draw(stageBatch, "" + (res / simTime)/(pins.stream().filter(p->p.pinType==Pin.PinType.OUT).count()) * 100f, 10, 15);
-
-
+        if(sim.time != 0)
+            font.draw(stageBatch, String.format("Valid: %1.1f%%",sim.getValidPercent()), 25, 20);
     }
 
     public void renderConstruction(float sx, float sy) {
@@ -430,8 +369,6 @@ public class MainGameScreen implements Screen {
 
     }
 
-    boolean simRunning = false;
-
 
     class MainInputProcessor implements InputProcessor {
         @Override
@@ -455,13 +392,9 @@ public class MainGameScreen implements Screen {
                     viabutton.setChecked(true);
                     break;
                 case Input.Keys.SPACE: {
-                    res = 0;
-                    cm.cleanUp();
-                    pins.forEach(p -> {
-                        p.testPinsState.clear();
-                    });
-                    simRunning = !simRunning;
-                    simTime = 0;
+                    sim.stop();
+                    sim.reset();
+                    sim.start();
                     break;
                 }
             }
@@ -507,7 +440,7 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int b) {
-            if (simRunning)
+            if (sim.isRunning())
                 return true;
             try {
                 click = b;
@@ -543,7 +476,7 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
-            if (simRunning)
+            if (sim.isRunning())
                 return true;
             int deltaX = getCellX(screenX) - lastCellX;
             int deltaY = getCellY(screenY) - lastCellY;
