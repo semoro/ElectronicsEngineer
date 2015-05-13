@@ -17,6 +17,7 @@ import java.util.Map;
  */
 public class TaskLoader {
     File task;
+    public String description;
 
     private PinStateList loadStates(JsonValue pinDef){
         PinStateList psL=new PinStateList();
@@ -35,6 +36,7 @@ public class TaskLoader {
         JsonValue root= jr.parse(new FileInputStream(task));
         int width=root.getInt("w");
         int height=root.getInt("h");
+        description = root.getString("desc", "Нет описания");
         ConstructionManager cm=new ConstructionManager(height,width);
         JsonValue pins=root.get("pins");
         pins.forEach(pinDef -> {
@@ -80,6 +82,7 @@ public class TaskLoader {
         JsonValue root= jr.parse(new FileInputStream(task));
         int width=root.getInt("w");
         int height=root.getInt("h");
+        description = root.getString("desc", "Нет описания");
         ConstructionManager cm=new ConstructionManager(height,width);
         JsonValue pins=root.get("pins");
         cm.load(ois);

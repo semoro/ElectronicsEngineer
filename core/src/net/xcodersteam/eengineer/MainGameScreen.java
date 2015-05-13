@@ -3,6 +3,7 @@ package net.xcodersteam.eengineer;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -11,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Align;
 import net.xcodersteam.eengineer.components.Pin;
 import net.xcodersteam.eengineer.components.Silicon;
 import net.xcodersteam.eengineer.components.Transistor;
@@ -36,12 +39,16 @@ public class MainGameScreen implements Screen {
     public static MainGameScreen instance;
     ConstructionManager cm;
     public SpriteBatch stageBatch;
+    public boolean open = true;
     ShapeRenderer renderer;
     TextButton buttonP;
     TextButton buttonC;
     TextButton buttonM;
     TextButton viabutton;
     TextButton close;
+    TextButton description;
+    TextButton test;
+    Label taskdesc;
     Stage stage;
     ButtonGroup group;
     public static BitmapFont font;
@@ -94,14 +101,19 @@ public class MainGameScreen implements Screen {
         fileChooser.showOpenDialog(null);
         if (fileChooser.getSelectedFile() == null)
             Gdx.app.exit();
-
+        String alf = "";
+        for( int i = 32; i < 127; i++ ) alf += (char)i; // цифры и весь английский
+        for( int i = 1024; i < 1104; i++ ) alf += (char)i; // русские
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("bender.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.characters = alf;
         font = generator.generateFont(parameter);
         generator.dispose();
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
 
         style.fontColor = Color.BLACK;
+        labelStyle.fontColor = Color.BLACK;
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
         File save = fileChooser.getSelectedFile();
@@ -115,6 +127,7 @@ public class MainGameScreen implements Screen {
         stage = new Stage();
 
         style.font = font;
+        labelStyle.font = font;
         group = new ButtonGroup();
         buttonP = new TextButton(new String(), style);
         buttonP.setText("Silicon P");
@@ -122,7 +135,6 @@ public class MainGameScreen implements Screen {
         setButton(buttonP, 3);
         buttonC = new TextButton(new String(), style);
         buttonC.setText("Silicon N");
-
         buttonC.setUserObject(new NSiliconTool());
         setButton(buttonC, 6);
         buttonM = new TextButton(new String(), style);
@@ -140,12 +152,52 @@ public class MainGameScreen implements Screen {
         close.setX(Gdx.graphics.getWidth() - 35);
         close.setY(Gdx.graphics.getHeight() - 35);
         stage.addActor(close);
+        test = new TextButton("Тест", style);
+        test.setWidth(100);
+        test.setHeight(15);
+        test.setX(20);
+        test.setY(145);
+        stage.addActor(test);
+        description = new TextButton("Описание", style);
+        description.setWidth(100);
+        description.setHeight(15);
+        description.setX(125);
+        description.setY(145);
+        stage.addActor(description);
+        taskdesc = new Label(task.description, labelStyle);
+        taskdesc.setWidth(Gdx.graphics.getWidth() - 50);
+        taskdesc.setHeight(-120);
+        taskdesc.setX(25);
+        taskdesc.setY(130);
+        taskdesc.setWrap(true);
+        taskdesc.setAlignment(Align.center, Align.left);
+        stage.addActor(taskdesc);
+        taskdesc.setVisible(false);
         group.uncheckAll();
         buttonP.addListener(new ButtonChangeListener(buttonP, "Silicon P", "[P-type]"));
         buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "[N-type]"));
         buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "[Metal]"));
         viabutton.addListener(new ButtonChangeListener(viabutton, "Via", "[Via]"));
-
+        description.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if(event.toString().equals("touchDown")) {
+                    taskdesc.setVisible(true);
+                    open = false;
+                }
+                return true;
+            }
+        });
+        test.addListener(new EventListener() {
+            @Override
+            public boolean handle(Event event) {
+                if(event.toString().equals("touchDown")) {
+                    taskdesc.setVisible(false);
+                    open = true;
+                }
+                return true;
+            }
+        });
         close.addListener(new EventListener() {
             @Override
             public boolean handle(Event event) {
@@ -249,28 +301,36 @@ public class MainGameScreen implements Screen {
         renderer.rect(Gdx.graphics.getWidth() - cellSize * 3, Gdx.graphics.getHeight() - cellSize * 3 * val - 35 - val++, cellSize * 3, cellSize * 3);
 
         renderer.setColor(Color.valueOf("CD853F"));
-        renderer.rect(0, 0, Gdx.graphics.getWidth(), 150);
+        renderer.rect(0, 0, Gdx.graphics.getWidth(), 165);
         renderer.setColor(Color.valueOf("D2B48C"));
         renderer.rect(20, 5, Gdx.graphics.getWidth() - 40, 140);
+        renderer.rect(20, 145, 100, 15);
+        renderer.setColor(Color.valueOf("FFCCBC"));
+        renderer.rect(125, 145, 100, 15);
         renderer.setColor(Color.BLACK);
-        renderer.set(ShapeRenderer.ShapeType.Line);
-        renderer.translate(30, 130, 0);
         float coef = (Gdx.graphics.getWidth() - 60f) / (float) sim.length;
-        for (Pin p : pins) {
-            if (p.pinType != Pin.PinType.VCC) {
-                if (p.pinType == Pin.PinType.IN) {
-                    renderer.setColor(Color.valueOf("26733A"));
-                    renderImpulse(p.states, coef, sim.length);
-                    renderer.setColor(Color.BLACK);
-                    renderImpulse(p.states, coef, sim.time);
-                } else if (p.pinType == Pin.PinType.OUT) {
-                    renderer.setColor(Color.valueOf("7F2F33"));
-                    renderImpulse(p.states, coef, sim.length);
-                    renderer.setColor(Color.BLACK);
-                    renderImpulse(p.testPinsState, coef, sim.time);
+        if(open) {
+            renderer.set(ShapeRenderer.ShapeType.Line);
+            renderer.translate(30, 130, 0);
+            for (Pin p : pins) {
+                if (p.pinType != Pin.PinType.VCC) {
+                    if (p.pinType == Pin.PinType.IN) {
+                        renderer.setColor(Color.valueOf("26733A"));
+                        renderImpulse(p.states, coef, sim.length);
+                        renderer.setColor(Color.BLACK);
+                        renderImpulse(p.states, coef, sim.time);
+                    } else if (p.pinType == Pin.PinType.OUT) {
+                        renderer.setColor(Color.valueOf("7F2F33"));
+                        renderImpulse(p.states, coef, sim.length);
+                        renderer.setColor(Color.BLACK);
+                        renderImpulse(p.testPinsState, coef, sim.time);
+                    }
+                    renderer.translate(0, -20, 0);
                 }
-                renderer.translate(0, -20, 0);
             }
+        } else {
+            renderer.setColor(Color.valueOf("FFCCBC"));
+            renderer.rect(20, 5, Gdx.graphics.getWidth() - 40, 140);
         }
         renderer.getTransformMatrix().setTranslation(0, 0, 0);
     }
@@ -294,14 +354,16 @@ public class MainGameScreen implements Screen {
         }
 
         int posY = 140;
-        for (Pin p : pins) {
-            if (p.pinType != Pin.PinType.VCC) {
-                font.draw(stageBatch, p.name, 2, posY);
-                posY -= 20;
+        if(open) {
+            for (Pin p : pins) {
+                if (p.pinType != Pin.PinType.VCC) {
+                    font.draw(stageBatch, p.name, 2, posY);
+                    posY -= 20;
+                }
             }
+            if (sim.time != 0)
+                font.draw(stageBatch, String.format("Valid: %1.1f%%", sim.getValidPercent()), 25, 20);
         }
-        if(sim.time != 0)
-            font.draw(stageBatch, String.format("Valid: %1.1f%%",sim.getValidPercent()), 25, 20);
     }
 
     public void renderConstruction(float sx, float sy) {
