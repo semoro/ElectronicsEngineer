@@ -22,7 +22,7 @@ public class TaskLoader {
     private PinStateList loadStates(JsonValue pinDef){
         PinStateList psL=new PinStateList();
         for (JsonValue jv:pinDef.get("state")){
-            PinState ps=new PinState(jv.asInt());
+            PinState ps=new PinState(jv.asInt()*5);
             ps.up=jv.name.equalsIgnoreCase("1");
             psL.add(ps);
         }

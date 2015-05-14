@@ -244,7 +244,7 @@ public class MainGameScreen implements Screen {
         Gdx.gl.glClearColor(235f / 255f, 218f / 255f, 159f / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         mDelt += delta;
-        if (mDelt >= 0.05f && sim.isRunning()) {
+        if (mDelt >= 0.01f && sim.isRunning()) {
             sim.simulate();
             mDelt = 0;
         }
