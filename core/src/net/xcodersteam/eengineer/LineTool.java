@@ -8,7 +8,7 @@ public abstract class LineTool {
 
     public abstract boolean isLineAble(Cell cell1, Cell cell2);
 
-    public abstract void setConnection(byte b, Cell c);
+    public abstract void setConnection(byte b, Cell c, Cell c2);
 
     public abstract byte getConnection(Cell c);
     

@@ -3,7 +3,6 @@ package net.xcodersteam.eengineer;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -16,8 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import net.xcodersteam.eengineer.components.Pin;
-import net.xcodersteam.eengineer.components.Silicon;
-import net.xcodersteam.eengineer.components.Transistor;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -336,10 +333,8 @@ public class MainGameScreen implements Screen {
     }
 
     public void renderSecondPass(int sx, int sy) {
-
         for (int x = 0; x < cm.width; x++) {
             for (int y = 0; y < cm.height; y++) {
-
                 if (cm.construction[x][y] != null) {
                     for (GirdComponent component : cm.construction[x][y].layers) {
                         if (component == null)
@@ -348,9 +343,7 @@ public class MainGameScreen implements Screen {
                         stageBatch.flush();
                     }
                 }
-
             }
-
         }
 
         int posY = 140;
@@ -484,16 +477,16 @@ public class MainGameScreen implements Screen {
             try {
                 Cell cell = cm.construction[cellX][cellY];
                 if (tool.isLineAble(cm.construction[cellX][cellY + 1], cell)) {
-                    tool.setConnection((byte) (-5 & tool.getConnection(cm.construction[cellX][cellY + 1])), cm.construction[cellX][cellY + 1]);
+                    tool.setConnection((byte) (-5 & tool.getConnection(cm.construction[cellX][cellY + 1])), cm.construction[cellX][cellY + 1], cm.construction[cellX][cellY]);
                 }
                 if (tool.isLineAble(cm.construction[cellX][cellY - 1], cell)) {
-                    tool.setConnection((byte) (-2 & tool.getConnection(cm.construction[cellX][cellY - 1])), cm.construction[cellX][cellY - 1]);
+                    tool.setConnection((byte) (-2 & tool.getConnection(cm.construction[cellX][cellY - 1])), cm.construction[cellX][cellY - 1], cm.construction[cellX][cellY]);
                 }
                 if (tool.isLineAble(cm.construction[cellX + 1][cellY], cell)) {
-                    tool.setConnection((byte) (-9 & tool.getConnection(cm.construction[cellX + 1][cellY])), cm.construction[cellX + 1][cellY]);
+                    tool.setConnection((byte) (-9 & tool.getConnection(cm.construction[cellX + 1][cellY])), cm.construction[cellX + 1][cellY], cm.construction[cellX][cellY]);
                 }
                 if (tool.isLineAble(cm.construction[cellX - 1][cellY], cell)) {
-                    tool.setConnection((byte) (-3 & tool.getConnection(cm.construction[cellX - 1][cellY])), cm.construction[cellX - 1][cellY]);
+                    tool.setConnection((byte) (-3 & tool.getConnection(cm.construction[cellX - 1][cellY])), cm.construction[cellX - 1][cellY], cm.construction[cellX][cellY]);
                 }
             } catch (Exception e) {
 
@@ -568,8 +561,8 @@ public class MainGameScreen implements Screen {
                             if (cell != null) {
                                 tool.perform(cell);
                                 if (tool.isLineAble(lastCell, getCellAt(lastScreenX, lastScreenY))) {
-                                    tool.setConnection((byte) (dir | tool.getConnection(lastCell)), lastCell);
-                                    tool.setConnection((byte) ((dir << 2 > 8 ? dir >> 2 : dir << 2) | tool.getConnection(cell)), cell);
+                                    tool.setConnection((byte) (dir | tool.getConnection(lastCell)), lastCell, cell);
+                                    tool.setConnection((byte) ((dir << 2 > 8 ? dir >> 2 : dir << 2) | tool.getConnection(cell)), cell, lastCell);
                                 }
                             }
                         }

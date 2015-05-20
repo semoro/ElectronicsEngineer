@@ -68,9 +68,9 @@ public class TaskLoader {
         cm.getCell(x,y).put(p);
         p.locked=true;
         p.connection=2|1;
-        new Metal(cm.getCell(x,y+1)).lock(true).connection=4|2;
-        new Metal(cm.getCell(x+1,y)).lock(true).connection=8|1;
-        new Metal(cm.getCell(x+1,y+1)).lock(true).connection=4|8;
+        new Metal(cm.getCell(x,y+1)).lock(true).connection = (4|2);
+        new Metal(cm.getCell(x+1,y)).lock(true).connection = (8|1);
+        new Metal(cm.getCell(x+1,y+1)).lock(true).connection = (4|8);
     }
 
 

@@ -17,7 +17,7 @@ public class ViaTool extends LineTool {
     }
 
     @Override
-    public void setConnection(byte b, Cell c) {
+    public void setConnection(byte b, Cell c, Cell c2) {
 
     }
 
