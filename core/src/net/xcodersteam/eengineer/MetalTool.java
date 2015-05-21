@@ -22,7 +22,7 @@ public class MetalTool extends LineTool {
 
     @Override
     public void setConnection(byte b, Cell c, Cell c2) {
-        if((c2.layers[2].locked && !c.layers[2].locked) || !c2.layers[2].locked)
+        if(c.layers[2]==null || c2.layers[2]==null || (c2.layers[2].locked && !c.layers[2].locked) || !c2.layers[2].locked )
             c.layers[2].connection = b;
     }
 
