@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class Cell implements Serializable{
     public static final int maxLayers = 3;
+    private static final long serialVersionUID = 2353247239130628787L;
     public boolean via;
     public GirdComponent[] layers = new GirdComponent[maxLayers];
     public void put(GirdComponent component){

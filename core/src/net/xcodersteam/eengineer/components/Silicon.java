@@ -9,6 +9,7 @@ import net.xcodersteam.eengineer.GirdComponent;
  * Created by fantasyday on 19.04.2015.
  */
 public class Silicon extends GirdComponent{
+    private static final long serialVersionUID = -6666724029056428546L;
     public Type type;
     public enum Type{
         N(Color.RED),P(Color.YELLOW);

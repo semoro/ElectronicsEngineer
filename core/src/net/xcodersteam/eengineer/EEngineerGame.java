@@ -9,13 +9,11 @@ public class EEngineerGame extends Game {
     }
 
     @Override
-	public void create() {
+	public void create(){
         try {
             this.setScreen(new MainGameScreen());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -9,6 +9,7 @@ import net.xcodersteam.eengineer.GirdComponent;
  * Created by fantasyday on 19.04.2015.
  */
 public class Metal extends GirdComponent {
+    public static final long serialVersionUID = -7889906890679865572L;
     Cell cell;
     public Metal(Cell cell) {
         cell.put(this);

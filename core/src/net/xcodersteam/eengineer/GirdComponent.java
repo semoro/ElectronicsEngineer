@@ -13,6 +13,7 @@ import net.xcodersteam.eengineer.components.Transistor.Type;
  * Created by fantasyday on 19.04.2015.
  */
 public abstract class GirdComponent implements Serializable{
+    private static final long serialVersionUID = -1215828219344976121L;
     public byte connection;
     public boolean isPower;
     public abstract Color getColor();

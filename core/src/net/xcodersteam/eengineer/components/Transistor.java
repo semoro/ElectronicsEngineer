@@ -6,6 +6,7 @@ import net.xcodersteam.eengineer.Cell;
 import net.xcodersteam.eengineer.GirdComponent;
 
 public class Transistor extends GirdComponent {
+	private static final long serialVersionUID = -4534383815643503088L;
 	public Type type;
 	public boolean isOpened;
 	
