@@ -258,7 +258,6 @@ public class MainGameScreen implements Screen {
         stageBatch.end();
         stage.act(delta);
         stage.draw();
-        throw new RuntimeException("D");
     }
 
 
