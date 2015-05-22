@@ -13,6 +13,16 @@ task run(dependsOn: classes, type: JavaExec) {
     workingDir = project.assetsDir
     ignoreExitValue = true
 }
+sourceSets {
+    main {
+        java{
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'res'
+        }
+    }
+}
 
 task dist(type: Jar) {
     from files(sourceSets.main.output.classesDir)
@@ -24,6 +34,8 @@ task dist(type: Jar) {
         attributes 'Main-Class': project.mainClassName
     }
 }
+
+
 
 dist.dependsOn classes
 
