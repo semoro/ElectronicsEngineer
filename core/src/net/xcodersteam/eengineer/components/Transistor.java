@@ -11,7 +11,7 @@ public class Transistor extends GirdComponent {
 	public boolean isOpened;
 	
 	public enum Type{
-		PnP(Color.YELLOW.cpy().mul(0.3f).add(Color.RED.cpy().mul(0.5f))),NpN(Color.RED.cpy().mul(0.3f).add(Color.YELLOW.cpy().mul(0.5f)));
+		PnP(Color.RED),NpN(Color.YELLOW);
 		public Color color;
         Type(Color c){
             color = c;
@@ -26,12 +26,16 @@ public class Transistor extends GirdComponent {
         }
     }
 
+
     @Override
     public void render(ShapeRenderer renderer, Cell c, int w, int h) {
         super.render(renderer, c, w, h);
-        renderer.setColor(Color.BLACK);
-        renderer.rectLine(10, 2, 10, 18, 3);
-        renderer.rectLine(2, 10, 18, 10, 3);
+        if(this.type == Type.NpN)
+            renderer.setColor(Color.RED);
+        else
+            renderer.setColor(Color.YELLOW);
+        renderer.rectLine(10, 4, 10, 16, 2);
+        renderer.rectLine(4, 10, 16, 10, 2);
     }
 
     @Override

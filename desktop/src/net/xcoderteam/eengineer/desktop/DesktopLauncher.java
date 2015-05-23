@@ -17,7 +17,6 @@ public class DesktopLauncher {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.height = 600;
         config.width = 600;
-        config.x=1500;
         config.resizable = false;
         new LwjglApplication(new EEngineerGame(), config);
         Thread.setDefaultUncaughtExceptionHandler((t1, e) -> {
