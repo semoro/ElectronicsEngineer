@@ -41,9 +41,13 @@ public class ConstructionManager {
         int utechka = 0;
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                if(construction[x][y] != null && isArrayEmpty(construction[x][y].layers)){
-                    construction[x][y] = null;
-                    utechka++;
+
+                if(construction[x][y] != null){
+                    if(isArrayEmpty(construction[x][y].layers)){
+                        construction[x][y] = null;
+                        utechka++;
+                    }
+
                 }
             }
         }

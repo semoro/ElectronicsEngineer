@@ -13,6 +13,7 @@ import net.xcodersteam.eengineer.components.Transistor.Type;
  * Created by fantasyday on 19.04.2015.
  */
 public abstract class GirdComponent implements Serializable{
+    private static final long serialVersionUID = -1215828219344976121L;
     public byte connection;
     public boolean isPower;
     public abstract Color getColor();
@@ -94,49 +95,57 @@ public abstract class GirdComponent implements Serializable{
     }
     
     public boolean getIsSiliconPowerOn(Cell[][] cells, int x, int y,Silicon.Type type){
-    	if((connection&0b1)>0&&cells[x][y+1]!=null){
-			if(((Silicon)cells[x][y+1].layers[getLayer()]).type==type&&((Silicon)cells[x][y+1].layers[getLayer()]).isPower){
-				return true;
-			}
-		}
-		if((connection&0b10)>0&&cells[x+1][y]!=null){
-			if(((Silicon)cells[x+1][y].layers[getLayer()]).type==type&&((Silicon)cells[x+1][y].layers[getLayer()]).isPower){
-				return true;
-			}
-		}
-		if((connection&0b100)>0&&cells[x][y-1]!=null){
-			if(((Silicon)cells[x][y-1].layers[getLayer()]).type==type&&((Silicon)cells[x][y-1].layers[getLayer()]).isPower){
-				return true;
-			}
-		}
-		if((connection&0b1000)>0&&cells[x-1][y]!=null){
-			if(((Silicon)cells[x-1][y].layers[getLayer()]).type==type&&((Silicon)cells[x-1][y].layers[getLayer()]).isPower){
-				return true;
-			}
-		}
+        try {
+            if ((connection & 0b1) > 0 && cells[x][y + 1] != null) {
+                if (((Silicon) cells[x][y + 1].layers[getLayer()]).type == type && ((Silicon) cells[x][y + 1].layers[getLayer()]).isPower) {
+                    return true;
+                }
+            }
+            if ((connection & 0b10) > 0 && cells[x + 1][y] != null) {
+                if (((Silicon) cells[x + 1][y].layers[getLayer()]).type == type && ((Silicon) cells[x + 1][y].layers[getLayer()]).isPower) {
+                    return true;
+                }
+            }
+            if ((connection & 0b100) > 0 && cells[x][y - 1] != null) {
+                if (((Silicon) cells[x][y - 1].layers[getLayer()]).type == type && ((Silicon) cells[x][y - 1].layers[getLayer()]).isPower) {
+                    return true;
+                }
+            }
+            if ((connection & 0b1000) > 0 && cells[x - 1][y] != null) {
+                if (((Silicon) cells[x - 1][y].layers[getLayer()]).type == type && ((Silicon) cells[x - 1][y].layers[getLayer()]).isPower) {
+                    return true;
+                }
+            }
+        }catch (Exception e){
+
+        }
 		return false;
     }
     
     public void setSiliconPowerOn(Cell[][] cells, int x, int y,Silicon.Type type){
-    	if((connection&0b1)>0&&cells[x][y+1]!=null){
-			if(((Silicon)cells[x][y+1].layers[getLayer()]).type==type){
-				cells[x][y+1].layers[getLayer()].powerOn(cells, x, y+1);
-			}
-		}
-		if((connection&0b10)>0&&cells[x+1][y]!=null){
-			if(((Silicon)cells[x+1][y].layers[getLayer()]).type==type){
-				cells[x+1][y].layers[getLayer()].powerOn(cells, x+1, y);
-			}
-		}
-		if((connection&0b100)>0&&cells[x][y-1]!=null){
-			if(((Silicon)cells[x][y-1].layers[getLayer()]).type==type){
-				cells[x][y-1].layers[getLayer()].powerOn(cells, x, y-1);
-			}
-		}
-		if((connection&0b1000)>0&&cells[x-1][y]!=null){
-			if(((Silicon)cells[x-1][y].layers[getLayer()]).type==type){
-				cells[x-1][y].layers[getLayer()].powerOn(cells, x-1, y);
-			}
-		}
+        try {
+            if ((connection & 0b1) > 0 && cells[x][y + 1] != null) {
+                if (((Silicon) cells[x][y + 1].layers[getLayer()]).type == type) {
+                    cells[x][y + 1].layers[getLayer()].powerOn(cells, x, y + 1);
+                }
+            }
+            if ((connection & 0b10) > 0 && cells[x + 1][y] != null) {
+                if (((Silicon) cells[x + 1][y].layers[getLayer()]).type == type) {
+                    cells[x + 1][y].layers[getLayer()].powerOn(cells, x + 1, y);
+                }
+            }
+            if ((connection & 0b100) > 0 && cells[x][y - 1] != null) {
+                if (((Silicon) cells[x][y - 1].layers[getLayer()]).type == type) {
+                    cells[x][y - 1].layers[getLayer()].powerOn(cells, x, y - 1);
+                }
+            }
+            if ((connection & 0b1000) > 0 && cells[x - 1][y] != null) {
+                if (((Silicon) cells[x - 1][y].layers[getLayer()]).type == type) {
+                    cells[x - 1][y].layers[getLayer()].powerOn(cells, x - 1, y);
+                }
+            }
+        }catch (Exception e){
+
+        }
     }
 }

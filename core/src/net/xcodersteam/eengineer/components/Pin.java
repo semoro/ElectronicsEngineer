@@ -13,7 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Pin extends GirdComponent {
-	public PinType pinType;
+    private static final long serialVersionUID = 9176901718169794977L;
+    public PinType pinType;
 	public String name;
     public Pin(String name){ this.name=name;  }
 	public Pin(){
