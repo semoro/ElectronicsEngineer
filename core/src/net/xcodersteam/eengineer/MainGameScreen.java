@@ -481,19 +481,22 @@ public class MainGameScreen implements Screen {
 
         public void deleteConnection(int cellX, int cellY, LineTool tool) {
             try {
-                Cell cell = cm.construction[cellX][cellY];
-                if (tool.isLineAble(cm.construction[cellX][cellY + 1], cell)) {
-                    tool.setConnection((byte) (-5 & tool.getConnection(cm.construction[cellX][cellY + 1])), cm.construction[cellX][cellY + 1], cm.construction[cellX][cellY]);
-                }
-                if (tool.isLineAble(cm.construction[cellX][cellY - 1], cell)) {
-                    tool.setConnection((byte) (-2 & tool.getConnection(cm.construction[cellX][cellY - 1])), cm.construction[cellX][cellY - 1], cm.construction[cellX][cellY]);
-                }
-                if (tool.isLineAble(cm.construction[cellX + 1][cellY], cell)) {
-                    tool.setConnection((byte) (-9 & tool.getConnection(cm.construction[cellX + 1][cellY])), cm.construction[cellX + 1][cellY], cm.construction[cellX][cellY]);
-                }
-                if (tool.isLineAble(cm.construction[cellX - 1][cellY], cell)) {
-                    tool.setConnection((byte) (-3 & tool.getConnection(cm.construction[cellX - 1][cellY])), cm.construction[cellX - 1][cellY], cm.construction[cellX][cellY]);
-                }
+                tool.setConnection((byte) (-5 & tool.getConnection(cm.construction[cellX][cellY + 1])), cm.construction[cellX][cellY + 1], cm.construction[cellX][cellY]);
+            } catch (Exception e) {
+
+            }
+            try {
+                tool.setConnection((byte) (-2 & tool.getConnection(cm.construction[cellX][cellY - 1])), cm.construction[cellX][cellY - 1], cm.construction[cellX][cellY]);
+            } catch (Exception e) {
+
+            }
+            try {
+                tool.setConnection((byte) (-9 & tool.getConnection(cm.construction[cellX + 1][cellY])), cm.construction[cellX + 1][cellY], cm.construction[cellX][cellY]);
+            } catch (Exception e) {
+
+            }
+            try {
+                tool.setConnection((byte) (-3 & tool.getConnection(cm.construction[cellX - 1][cellY])), cm.construction[cellX - 1][cellY], cm.construction[cellX][cellY]);
             } catch (Exception e) {
 
             }
