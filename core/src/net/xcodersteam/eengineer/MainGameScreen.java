@@ -385,8 +385,13 @@ public class MainGameScreen implements Screen {
                     if (d) {
                         renderer.setColor(Color.BLACK);
                         renderer.set(ShapeRenderer.ShapeType.Line);
+                        renderer.line(0, 15, 5, cellSize);
+                        renderer.line(0, 10, 10, cellSize);
+                        renderer.line(0, 5, 15, cellSize);
                         renderer.line(0, 0, cellSize, cellSize);
-                        renderer.line(0, cellSize, cellSize, 0);
+                        renderer.line(5, 0, cellSize, 15);
+                        renderer.line(10, 0, cellSize, 10);
+                        renderer.line(15, 0, cellSize, 5);
                         renderer.set(ShapeRenderer.ShapeType.Filled);
                     }
                 }

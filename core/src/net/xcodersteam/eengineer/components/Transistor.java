@@ -25,7 +25,15 @@ public class Transistor extends GirdComponent {
         }
     }
 
-	@Override
+    @Override
+    public void render(ShapeRenderer renderer, Cell c, int w, int h) {
+        super.render(renderer, c, w, h);
+        renderer.setColor(Color.BLACK);
+        renderer.rectLine(10, 2, 10, 18, 3);
+        renderer.rectLine(2, 10, 18, 10, 3);
+    }
+
+    @Override
 	public Color getColor() {
 		return type.color;
 	}
