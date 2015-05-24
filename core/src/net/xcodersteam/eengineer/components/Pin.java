@@ -12,7 +12,7 @@ import net.xcodersteam.eengineer.*;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Pin extends GirdComponent {
+public class Pin extends Metal {
     private static final long serialVersionUID = 9176901718169794977L;
     public PinType pinType;
 	public String name;
@@ -51,9 +51,6 @@ public class Pin extends GirdComponent {
     @Override
     public void renderSecondPass(Batch b, Cell c, int x, int y, int w, int h) {
         super.renderSecondPass(b, c, x, y, w, h);
-
-
-            MainGameScreen.font.draw(b, name, x+5, y+h);
-
+        MainGameScreen.font.draw(b, name, x+5, y+h);
     }
 }

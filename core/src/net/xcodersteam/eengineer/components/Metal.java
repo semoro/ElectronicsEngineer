@@ -28,13 +28,15 @@ public class Metal extends GirdComponent {
         renderer.setColor(getColor());
         drawStandartRect(renderer, w, h);
         if(c.layers[1] != null) {
+            c.layers[1].render(renderer, c, w, h);
             byte connection = (byte) (this.connection & c.layers[1].connection);
-            renderer.setColor(getColor().cpy().add(c.layers[1].getColor()).mul(0.5f));
+            renderer.setColor(getColor().cpy().mul(1,1,1,0.5f));
             int borderTop = -(connection & 1) * 3;
             int borderRight = -(connection >> 1 & 1) * 3;
             int borderBottom = -(connection >> 2 & 1) * 3;
             int borderLeft = -(connection >> 3 & 1) * 3;
             renderer.rect(borderLeft + 2f, borderBottom + 2f, w - borderLeft - borderRight - 4f, h - borderBottom - borderTop - 4f);
+
         }
     }
 

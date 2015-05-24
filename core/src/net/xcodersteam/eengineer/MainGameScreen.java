@@ -34,7 +34,7 @@ public class MainGameScreen implements Screen {
     }
 
     public static MainGameScreen instance;
-    ConstructionManager cm;
+    public ConstructionManager cm;
     public SpriteBatch stageBatch;
     public boolean open = true;
     ShapeRenderer renderer;
@@ -51,7 +51,7 @@ public class MainGameScreen implements Screen {
     public static BitmapFont font;
     public static int x = 100;
     public static int y = 200;
-    TaskLoader task;
+    public TaskLoader task;
 
     public void setButton(TextButton button, float x) {
         group.add(button);
@@ -64,40 +64,11 @@ public class MainGameScreen implements Screen {
 
     public List<Pin> pins = new LinkedList<>();
 
-    JFileChooser fileChooser;
     Simulation sim;
 
-    public MainGameScreen() throws IOException, ClassNotFoundException {
+    public MainGameScreen(File save) throws IOException, ClassNotFoundException {
         instance = this;
-        fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File("."));
-        fileChooser.addChoosableFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.getName().endsWith(".task") || f.isDirectory();
-            }
 
-            @Override
-            public String getDescription() {
-                return "Файл задания";
-            }
-        });
-        fileChooser.addChoosableFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return f.getName().endsWith(".sv") || f.isDirectory();
-            }
-
-            @Override
-            public String getDescription() {
-                return "Файл сохранения";
-            }
-        });
-        fileChooser.setDialogTitle("Задание");
-        fileChooser.removeChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
-        fileChooser.showOpenDialog(null);
-        if (fileChooser.getSelectedFile() == null)
-            Gdx.app.exit();
         String alf = "";
         for( int i = 32; i < 127; i++ ) alf += (char)i; // цифры и весь английский
         for( int i = 1024; i < 1104; i++ ) alf += (char)i; // русские
@@ -113,7 +84,6 @@ public class MainGameScreen implements Screen {
         labelStyle.fontColor = Color.BLACK;
         stageBatch = new SpriteBatch();
         renderer = new ShapeRenderer();
-        File save = fileChooser.getSelectedFile();
         if (save.getName().endsWith(".sv")) {
             task = new TaskLoader(save);
             cm = task.load();
@@ -175,58 +145,49 @@ public class MainGameScreen implements Screen {
         buttonC.addListener(new ButtonChangeListener(buttonC, "Silicon N", "[N-type]"));
         buttonM.addListener(new ButtonChangeListener(buttonM, "Metal", "[Metal]"));
         viabutton.addListener(new ButtonChangeListener(viabutton, "Via", "[Via]"));
-        description.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if(event.toString().equals("touchDown")) {
-                    taskdesc.setVisible(true);
-                    open = false;
-                }
-                return true;
+        description.addListener(event -> {
+            if(event.toString().equals("touchDown")) {
+                taskdesc.setVisible(true);
+                open = false;
             }
+            return true;
         });
-        test.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if(event.toString().equals("touchDown")) {
-                    taskdesc.setVisible(false);
-                    open = true;
-                }
-                return true;
+        test.addListener(event -> {
+            if(event.toString().equals("touchDown")) {
+                taskdesc.setVisible(false);
+                open = true;
             }
+            return true;
         });
-        close.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event.toString().equals("touchDown")) {
-                    try {
-                        JFileChooser fileChooser1 = new JFileChooser();
-                        fileChooser1.removeChoosableFileFilter(fileChooser1.getAcceptAllFileFilter());
-                        fileChooser1.addChoosableFileFilter(new FileFilter() {
-                            @Override
-                            public boolean accept(File f) {
-                                return f.isDirectory() || f.getName().endsWith(".sv");
-                            }
+        close.addListener(event -> {
+            if (event.toString().equals("touchDown")) {
+                try {
+                    JFileChooser fileChooser1 = new JFileChooser();
+                    fileChooser1.removeChoosableFileFilter(fileChooser1.getAcceptAllFileFilter());
+                    fileChooser1.addChoosableFileFilter(new FileFilter() {
+                        @Override
+                        public boolean accept(File f) {
+                            return f.isDirectory() || f.getName().endsWith(".sv");
+                        }
 
-                            @Override
-                            public String getDescription() {
-                                return "Файл сохранения";
-                            }
-                        });
-                        fileChooser1.setCurrentDirectory(new File("./сохранения/"));
-                        fileChooser1.setSelectedFile(new File("./сохранения/текущее.sv"));
+                        @Override
+                        public String getDescription() {
+                            return "Файл сохранения";
+                        }
+                    });
+                    fileChooser1.setCurrentDirectory(new File("./сохранения/"));
+                    fileChooser1.setSelectedFile(new File("./сохранения/текущее.sv"));
 
-                        fileChooser1.showSaveDialog(null);
+                    fileChooser1.showSaveDialog(null);
 
-                        if (fileChooser1.getSelectedFile() != null)
-                            task.save(fileChooser1.getSelectedFile(), cm);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Gdx.app.exit();
+                    if (fileChooser1.getSelectedFile() != null)
+                        task.save(fileChooser1.getSelectedFile(), cm);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                return true;
+                Gdx.app.exit();
             }
+            return true;
         });
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, new MainInputProcessor()));
         sim=new Simulation(this);
@@ -247,11 +208,15 @@ public class MainGameScreen implements Screen {
             mDelt = 0;
         }
 
+
+        Gdx.gl.glEnable(Gdx.gl.GL_BLEND);
+        Gdx.gl.glBlendFunc(Gdx.gl.GL_SRC_ALPHA, Gdx.gl.GL_ONE_MINUS_SRC_ALPHA);
         renderer.begin(ShapeRenderer.ShapeType.Filled);
         renderer.setAutoShapeType(true);
         renderConstruction(x, y);
         renderGui();
         renderer.end();
+        Gdx.gl.glDisable(Gdx.gl.GL_BLEND);
         stageBatch.begin();
 
         renderSecondPass(x, y);
@@ -453,6 +418,7 @@ public class MainGameScreen implements Screen {
                     viabutton.setChecked(true);
                     break;
                 case Input.Keys.SPACE: {
+
                     sim.stop();
                     sim.reset();
                     sim.start();
@@ -504,6 +470,8 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int b) {
+            //if(screenY<35)
+            //    EEngineerGame.dragListener.mouseDown(screenX,screenY);
             if (sim.isRunning())
                 return true;
             try {
@@ -540,6 +508,8 @@ public class MainGameScreen implements Screen {
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
+           // if(screenY<35)
+           // EEngineerGame.dragListener.mouseDrag(screenX,screenY);
             if (sim.isRunning())
                 return true;
             int deltaX = getCellX(screenX) - lastCellX;
