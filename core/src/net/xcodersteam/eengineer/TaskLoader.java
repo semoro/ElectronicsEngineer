@@ -7,6 +7,7 @@ import net.xcodersteam.eengineer.components.Metal;
 import net.xcodersteam.eengineer.components.Pin;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TaskLoader {
 
     public void save(File out,ConstructionManager cm) throws IOException {
         ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream(out));
-        oos.writeUTF(task.getPath());
+        oos.writeUTF(out.getParentFile().getAbsoluteFile().toPath().relativize(task.getAbsoluteFile().toPath()).toString());
         cm.save(oos);
         oos.close();
     }
@@ -75,9 +76,15 @@ public class TaskLoader {
 
 
     public ConstructionManager load() throws IOException, ClassNotFoundException {
+        File tmp=task;
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(task));
         String path=ois.readUTF();
-        task=new File(path);
+        task=new File(tmp.getParentFile().getAbsoluteFile(),path);
+        System.out.println(task);
+        System.out.println(tmp);
+        if(!task.exists()){//Костыль для обратной совместимости
+            task=new File(path);
+        }
         JsonReader jr=new JsonReader();
         JsonValue root= jr.parse(new FileInputStream(task));
         int width=root.getInt("w");

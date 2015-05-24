@@ -133,13 +133,14 @@ public class DesktopLauncher {
                 JLabel background = new JLabel(ii);
                // frame.setContentPane(background);
                 frame.add(background,BorderLayout.CENTER);
-                String saveFile;
+                String saveFile = null;
                 try{
 
                     saveFile="Восстановленно."+df.format(new Date())+".sv";
                     MainGameScreen.instance.task.save(new File("сохранения/"+saveFile),MainGameScreen.instance.cm);
                 }catch (Exception xe){
                     xe.printStackTrace();
+                    new File("сохранения/"+saveFile).delete();
                     saveFile=null;
                 }
                 JLabel msg;
